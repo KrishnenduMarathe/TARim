@@ -1,6 +1,6 @@
 # C COMPILER
 CC=gcc
-CCFLAGS=
+CCFLAGS=-g
 
 # Test Objects
 TEST=readFile.o writeFile.o

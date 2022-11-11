@@ -1,4 +1,4 @@
-#include "rwstruct.h"
+#include "../src/rwstruct.h"
 
 // Identify Directory
 int isDir(const char* filePath)
@@ -17,7 +17,7 @@ int isReg(const char* filePath)
 }
 
 // Count Directory and Files
-void countDirFile(char *basePath, NODES* node)
+void countDirFile(char *basePath, METADATA* meta)
 {
 	char *path;
 	struct dirent *dp;
@@ -29,8 +29,13 @@ void countDirFile(char *basePath, NODES* node)
 	{
 		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
 		{
-			path = malloc(sizeof(basePath) + sizeof("/") + sizeof(dp->d_name));
-			
+			path = (char*) malloc(sizeof(basePath) + sizeof("/") + sizeof(dp->d_name));
+			if (path == NULL)
+			{
+				printf("(ERROR) Cannot allocate memory to countDirFile's character array\n");
+				exit(1);
+			}
+
 			strcpy(path, basePath);
 			strcat(path, "/");
 			strcat(path, dp->d_name);
@@ -38,16 +43,16 @@ void countDirFile(char *basePath, NODES* node)
 			if (isDir(path))
 			{
 				//printf("DIR:: %s\n", dp->d_name);
-				node->numFolder += 1;
+				meta->numFolder += 1;
 			}
 			
 			if (isReg(path))
 			{
 				//printf("FILE:: %s\n", path);
-				node->numFile += 1;
+				meta->numFile += 1;
 			}
 			
-			countDirFile(path, node);
+			countDirFile(path, meta);
 			free(path);
 		}
 	}
@@ -55,12 +60,36 @@ void countDirFile(char *basePath, NODES* node)
 	closedir(dir);
 }
 
-// Go through path recursively
-void walkDirectory(char *basePath, FILESTRUCTURE* fstruct)
+// Save File Structure Element
+void saveFileELement(char* filePath, FILE* archive, uint8_t ftype)
+{
+	FILESAVE fsave;
+	fsave.type = ftype;
+	strncpy(fsave.fpath, filePath, FP_MAX);
+	fsave.fpath[FP_MAX] = '\0';
+
+	if (ftype == FS_FILE)
+	{
+		FILE* regfile = fopen(filePath, "r");
+		if (regfile == NULL)
+		{
+			fsave.fsize = 0L;
+		} else {
+			fseek(regfile, 0L, SEEK_END);
+			fsave.fsize = ftell(regfile);
+		}
+		fclose(regfile);
+	} else
+	{ fsave.fsize = 0L; }
+
+	fwrite(&fsave, sizeof(FILESAVE), 1, archive);
+}
+
+// Read Folder Structure
+void writeFolderStructure(char* basePath, unsigned int* fc, METADATA* meta, FILE* archive, char** folderPaths)
 {
 	char *path;
 	struct dirent *dp;
-	static unsigned int itrfile = 0;
 	
 	DIR *dir = opendir(basePath);
 	if (!dir) { return; }
@@ -69,34 +98,41 @@ void walkDirectory(char *basePath, FILESTRUCTURE* fstruct)
 	{
 		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
 		{
-			path = malloc(sizeof(basePath) + sizeof("/") + sizeof(dp->d_name));
-			
+			path = (char*) malloc(FP_MAX+1);
+			if (path == NULL)
+			{
+				printf("(ERROR) Cannot allocate memory to writeFileStructure's character array\n");
+				exit(1);
+			}
+
 			strcpy(path, basePath);
 			strcat(path, "/");
 			strcat(path, dp->d_name);
 
-			//if (isDir(path)) { printf("DIR:: %s\n", dp->d_name); }
+			path[(sizeof(basePath)+sizeof("/")+sizeof(dp->d_name)) / sizeof(char)] = '\0';
 
-			if (isReg(path))
+			if (isDir(path))
 			{
-				//printf("FILE:: %s\n", path);
-				strcpy(fstruct->files[itrfile], path);
-
-				FILE* regfile = fopen(path, "r");
-				if (regfile == NULL)
+				int flag = 1;
+				for (unsigned int itr = 0; itr < *fc; itr++)
 				{
-					fstruct->sizes[itrfile] = 0L;
-				} else
-				{
-					fseek(regfile, 0L, SEEK_END);
-					fstruct->sizes[itrfile] = ftell(regfile);
+					if (strcmp(folderPaths[itr], path) == 0)
+					{
+						flag = 0;
+						break;
+					}
 				}
+				if (flag == 1)
+				{
+					saveFileELement(path, archive, FS_FOLDER);
 
-				fclose(regfile);
-				itrfile++;
+					// Add path to the folderPathsArray
+					strcpy(folderPaths[*fc], path);
+					*fc += 1;
+				}
 			}
 			
-			walkDirectory(path, fstruct);
+			writeFolderStructure(path, fc, meta, archive, folderPaths);
 			free(path);
 		}
 	}
@@ -104,106 +140,191 @@ void walkDirectory(char *basePath, FILESTRUCTURE* fstruct)
 	closedir(dir);
 }
 
-
-// later add special tags to specify files and folders
-int main(int argc, char** argv)
+// Write File Structure
+void writeFileStructure(char* basePath, unsigned int* fc, METADATA* meta, FILE* archive, char** filePaths)
 {
-	// Number of Files nad Folder
-	NODES node;
-	node.numFile = 0;
-	node.numFolder = 0;
+	char *path;
+	struct dirent *dp;
+	
+	DIR *dir = opendir(basePath);
+	if (!dir) { return; }
 
-	// File Metadata
-	METADATA meta;
-	// Dummy values for metadata
-	strcpy(meta.whoami, "TARim - KodeSpace:YouTube");
-	meta.version = 0;
-	meta.revision = 1;
-	meta.encrypt = NO_ENCRYPT;
-
-	// FIle Structure
-	FILESTRUCTURE fstruct;
-
-	// check if argments are files or folders & innclude them in the directory list
-	// Open the directories
-	for (unsigned int itr = 1; itr < argc; itr++)
+	while ((dp = readdir(dir)) != NULL)
 	{
-		countDirFile(argv[itr], &node);
-	}
-
-	// Initialise file structure
-	fstruct.files = malloc(sizeof(char*) * node.numFile);
-	for (unsigned int i = 0; i < node.numFile; i++)
-	{ fstruct.files[i] = malloc(sizeof(char) * PATH_MAX); }
-
-	fstruct.sizes = calloc(node.numFile, sizeof(unsigned long int));
-
-	// Traverse directories
-	for (unsigned int itr = 1; itr < argc; itr++)
-	{
-		walkDirectory(argv[itr], &fstruct);
-	}
-
-	// Assign fle structure size
-	meta.size = sizeof(fstruct);
-
-	// DEBUG -> print files and sizes from filestructure
-	/*for (unsigned int itr = 0; itr < node.numFile; itr++)
-	{
-		printf("%s -> %lu\n", fstruct.files[itr], fstruct.sizes[itr]);
-	}*/
-
-	// Write Files to a default file
-	FILE* archive = fopen("test.tarim", "wb");
-
-	//printf("(sizeof) Metadata=%lu, FileStruct=%lu\n", sizeof(METADATA), sizeof(fstruct));
-
-	// Write Metadata
-	fwrite(&meta, sizeof(METADATA), 1, archive);
-	// Write FileStructure
-	fwrite(&fstruct, sizeof(fstruct), 1, archive);
-	// Write Files
-	for (unsigned int itr = 0; itr < node.numFile; itr++)
-	{
-		if (fstruct.sizes[itr] != 0)
+		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
 		{
-			printf("-> Writing '%s'\n", fstruct.files[itr]);
-			FILE* in = fopen(fstruct.files[itr], "rb");
-			if (in == NULL)
+			path = (char*) malloc(FP_MAX+1);
+			if (path == NULL)
 			{
-				printf("(ERROR) Could not open file '%s'", fstruct.files[itr]);
-
-				fclose(archive);
-
-				// Free Space
-				for (unsigned int i = 0; i < node.numFile; i++)
-				{ free(fstruct.files[i]); }
-				free(fstruct.files);
-
-				free(fstruct.sizes);
-
-				// EXIT
+				printf("(ERROR) Cannot allocate memory to writeFileStructure's character array\n");
 				exit(1);
 			}
 
-			unsigned char buffer[4];
-			while (fread(buffer, sizeof(buffer), 1, in) == 1)
-			{
-				fwrite(buffer, sizeof(buffer), 1, archive);
-			}
+			strcpy(path, basePath);
+			strcat(path, "/");
+			strcat(path, dp->d_name);
 
-			fclose(in);
+			path[(sizeof(basePath)+sizeof("/")+sizeof(dp->d_name)) / sizeof(char)] = '\0';
+
+			if (isReg(path))
+			{
+				saveFileELement(path, archive, FS_FILE);
+
+				// Add path to the filePathsArray
+				strcpy(filePaths[*fc], path);
+				*fc += 1;
+			}
+			
+			writeFileStructure(path, fc, meta, archive, filePaths);
+			free(path);
 		}
 	}
 
+	closedir(dir);
+}
+
+// Add Support for Encryption Later
+// Check if arguments are files in the main program
+int main(int argc, char** argv)
+{
+	METADATA meta;
+
+	// Initiate Metadata values
+	strcpy(meta.whoami, "TARim: KodeSpace");
+	meta.version = 0;
+	meta.revision = 1;
+	meta.encrypt = NO_ENCRYPT;
+	meta.numFile = 0;
+	meta.numFolder = 0;
+
+	// Count All Directories and Folders
+	for (unsigned int itr = 1; itr < argc; itr++)
+	{
+		if (isDir(argv[itr])) { meta.numFolder += 1; }
+		if (isReg(argv[itr])) { meta.numFile += 1; }
+		countDirFile(argv[itr], &meta);
+	}
+
+	// Create Archive
+	FILE* archive = fopen("test.tarim", "wb");
+	if (archive == NULL)
+	{
+		printf("(ERROR) Failed to create directory.\n");
+		exit(1);
+	}
+
+	// Write Metadata
+	fwrite(&meta, sizeof(METADATA), 1, archive);
+	// Debug
+	printf("METADATA:\n");
+	printf("\tWHO: %s\n\tVer: %u\n\tRev: %u\n\tENCRYPT: %u\n\tFiles: %u\n\tFolders: %u\n\n", meta.whoami, meta.version, meta.revision, meta.encrypt, meta.numFile, meta.numFolder);
+
+	// Folder Paths Array
+	char** folderPathArray = (char**) malloc(sizeof(char*) * meta.numFolder);
+	if (folderPathArray == NULL)
+	{
+		printf("(ERROR) Cannot allocate memory to Folder Path Array.\n");
+		exit(1);
+	}
+	for (unsigned int itr = 0; itr < meta.numFolder; itr++)
+	{
+		folderPathArray[itr] = (char*) malloc(sizeof(char) * (FP_MAX+1));
+		if (folderPathArray[itr] == NULL)
+		{
+			for (unsigned int itr2 = 0; itr2 < itr; itr2++)
+			{
+				free(folderPathArray[itr2]);
+			}
+			free(folderPathArray);
+
+			printf("(ERROR) Cannot Allocate memeory for folder path{%u}\n", itr);
+			exit(1);
+		}
+	}
+
+	// Write Folder Structure
+	unsigned int fcount = 0;
+	for (unsigned int itr = 1; itr < argc; itr++)
+	{
+		if (isDir(argv[itr]))
+		{
+			saveFileELement(argv[itr], archive, FS_FOLDER);
+			strcpy(folderPathArray[fcount], argv[itr]);
+			fcount++;
+		}
+	}
+	for (unsigned int itr = 1; itr < argc; itr++)
+	{ writeFolderStructure(argv[itr], &fcount, &meta, archive, folderPathArray); }
+
+	// Free Allocated Space
+	for (unsigned int itr = 0; itr < meta.numFolder; itr++)
+	{ free(folderPathArray[itr]); }
+	free(folderPathArray);
+
+	// File Paths Array
+	char** filePathsArray = (char**) malloc(sizeof(char*) * meta.numFile);
+	if (filePathsArray == NULL)
+	{
+		printf("(ERROR) Cannot allocate memory to File Path Array.\n");
+		exit(1);
+	}
+	for (unsigned int itr = 0; itr < meta.numFile; itr++)
+	{
+		filePathsArray[itr] = (char*) malloc(sizeof(char) * (FP_MAX+1));
+		if (filePathsArray[itr] == NULL)
+		{
+			for (unsigned int itr2 = 0; itr2 < itr; itr2++)
+			{
+				free(filePathsArray[itr2]);
+			}
+			free(filePathsArray);
+			
+			printf("(ERROR) Cannot Allocate memeory for file path{%u}\n", itr);
+			exit(1);
+		}
+	}
+
+	// Write File Structure
+	fcount = 0;
+	for (unsigned int itr = 1; itr < argc; itr++)
+	{
+		if (isReg(argv[itr]))
+		{
+			saveFileELement(argv[itr], archive, FS_FILE);
+			strcpy(filePathsArray[fcount], argv[itr]);
+			fcount++;
+		}
+	}
+	for (unsigned int itr = 1; itr < argc; itr++)
+	{ writeFileStructure(argv[itr], &fcount, &meta, archive, filePathsArray); }
+
+	// Write Files
+	for (unsigned int itr = 0; itr < meta.numFile; itr++)
+	{
+		// DEBUG
+		//printf("%u. %s\n", itr, filePathsArray[itr]);
+
+		printf("-> Writing '%s'\n", filePathsArray[itr]);
+
+		FILE* in = fopen(filePathsArray[itr], "rb");
+		if (in == NULL)
+		{
+			printf("(ERROR) Could not open file '%s'\n", filePathsArray[itr]);
+			break;
+		}
+
+		unsigned char buffer[4];
+		while (fread(buffer, sizeof(buffer), 1, in) == 1)
+		{ fwrite(buffer, sizeof(buffer), 1, archive); }
+
+		fclose(in);
+	}
 	fclose(archive);
 
-	// Free Space
-	for (unsigned int i = 0; i < node.numFile; i++)
-	{ free(fstruct.files[i]); }
-	free(fstruct.files);
+	// Free filePathsArray
+	for (unsigned int itr = 0; itr < meta.numFile; itr++)
+	{ free(filePathsArray[itr]); }
+	free(filePathsArray);
 
-	free(fstruct.sizes);
-	
 	return 0;
 }

@@ -313,9 +313,9 @@ int main(int argc, char** argv)
 			break;
 		}
 
-		unsigned char buffer[4];
-		while (fread(buffer, sizeof(buffer), 1, in) == 1)
-		{ fwrite(buffer, sizeof(buffer), 1, archive); }
+		unsigned char buffer;
+		while (fread(&buffer, sizeof(unsigned char), 1, in) == 1)
+		{ fwrite(&buffer, sizeof(unsigned char), 1, archive); }
 
 		fclose(in);
 	}

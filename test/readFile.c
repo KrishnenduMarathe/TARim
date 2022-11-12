@@ -56,12 +56,12 @@ void extractArchive(FILE* archive, METADATA* meta)
 	unsigned long int count;
 
 	unsigned long long int pos = 0L;
-	pos += sizeof(*meta); // consider metadata
+	/*pos += sizeof(*meta); // consider metadata
 	pos += (meta->numFolder * sizeof(FILESAVE)); // consider folder structure
 	pos += (meta->numFile * sizeof(FILESAVE)); // consider file structure
 	pos += 1; // bring cursor to read position
 	
-	fseek(archive, pos, SEEK_SET);
+	fseek(archive, pos, SEEK_SET);*/
 
 	for (unsigned int itr = 0; itr < meta->numFile; itr++)
 	{
@@ -77,13 +77,13 @@ void extractArchive(FILE* archive, METADATA* meta)
 		count = 0L;
 		while (!feof(archive))
 		{
-			if (count > fileMetadata[itr].fsize)
+			if (count >= fileMetadata[itr].fsize)
 			{ break; }
 
-			fread(&buffer, sizeof(buffer), 1, archive);
-			fwrite(&buffer, sizeof(buffer), 1, out);
-			count += sizeof(buffer);
-			pos += sizeof(buffer);
+			fread(&buffer, sizeof(unsigned char), 1, archive);
+			fwrite(&buffer, sizeof(unsigned char), 1, out);
+			count += sizeof(unsigned char);
+			pos += sizeof(unsigned char);
 		}
 
 		fclose(out);

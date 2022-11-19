@@ -3,17 +3,17 @@ CC=gcc
 CCFLAGS=-g -lcrypto
 
 # Test Objects
-TEST=readFile.o writeFile.o aes.o blowfish.o camellia.o
+TEST=aes.o aria.o camellia.o readFile.o writeFile.o
 
 all: $(TEST)
 
 # Object Rules
 %.o: %.c
-	@echo "=> $(CC) $^ -o $@"
-	$(shell $(CC) $^ -o $@)
+	@echo "=> $(CC) $^ -o $@ $(CCFLAGS)"
+	$(shell $(CC) $^ -o $@ $(CCFLAGS))
 
 # Clean Rules
 .PHONY: clean
 clean:
 	$(shell rm *.o)
-	@echo "Project Cleaned!"
+	@echo "Test Cleaned!"

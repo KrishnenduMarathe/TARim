@@ -1,9 +1,9 @@
 # C COMPILER
 CC=gcc
-CCFLAGS=-g
+CCFLAGS=-g -lcrypto
 
 # Test Objects
-TEST=readFile.o writeFile.o
+TEST=readFile.o writeFile.o aes.o blowfish.o camellia.o
 
 all: $(TEST)
 

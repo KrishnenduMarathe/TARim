@@ -5,7 +5,7 @@ Archive Manager for custom tape archive format with added features ".tarim" (for
 1. Built from scratch and completely open source
 2. Tape Archive - Bunch multiple files and directories into a single bulk file
 3. Selective Extraction supported
-4. AES, Blowfish and Camellia encryption supported (OpenSSL)
+4. AES-256, Blowfish and Camellia-256 encryption supported (OpenSSL)
 
 ## Limitations
 1. 

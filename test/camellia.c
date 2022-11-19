@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "CAMELLIA-256-CBC", NULL);
 	if (cipher == NULL)
 	{
-		printf("(ERROR_ Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;

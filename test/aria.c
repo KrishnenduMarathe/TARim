@@ -146,7 +146,7 @@ int main(int argc, char** argv)
 		printf("(ERROR) Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		return 1;
 	}
-	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "AES-256-CBC", NULL);
+	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "ARIA-256-CBC", NULL);
 	if (cipher == NULL)
 	{
 		printf("(ERROR) Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));

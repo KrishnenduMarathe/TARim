@@ -263,11 +263,14 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 	{
 		if (fArray[itr].type == FS_FOLDER)
 		{ continue; }
+
+		// STDOUT Message
+		printf("-> (write_archive) Writing '%s'\n", fArray[itr].fpath);
 		
 		infile = fopen(fArray[itr].fpath, "rb");
 		if (infile == NULL)
 		{
-			printf("(ERROR) write_archive: Failed tp open file '%s'\n", fArray[itr].fpath);
+			printf("(ERROR) write_archive: Failed to open file '%s'\n", fArray[itr].fpath);
 			return 1;
 		}
 

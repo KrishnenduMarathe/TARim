@@ -17,9 +17,6 @@ int gen_128_iv(unsigned char* iv)
 		return 1;
 	}
 
-	// DEBUG
-	printf("(DEBUG) [1] IV: %X\n", iv);
-
 	return 0;
 }
 

@@ -122,6 +122,8 @@ static void recursiveFilesaveArray(char*, long int*, TARIM_FILESAVE*);
 TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA, int, char**);
 // Populate Metadata
 int update_write_metadata(TARIM_METADATA*, TARIM_CRYPT_MODES, int, char**, FILE*);
+// Read Metadata and File Database
+TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA*, FILE*);
 // Write File Database and Archive
 int write_archive(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*);
 

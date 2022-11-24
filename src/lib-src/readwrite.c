@@ -133,7 +133,7 @@ static void recursiveFilesaveArray(char* basePath, long int* fc, TARIM_FILESAVE*
 // Gather Files and Folders Objects
 TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args)
 {
-	TARIM_FILESAVE* fileFolderObjects;
+	TARIM_FILESAVE* fileFolderObjects = NULL;
 	long int fcount = 0;
 	long int fileFolderObjectsSize = -1;
 
@@ -231,6 +231,43 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 	// Write Metadata
 	fwrite(meta, sizeof(TARIM_METADATA), 1, archive);
 	return 0;
+}
+
+// Read Metadata and File Database
+TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
+{
+	if (meta == NULL)
+	{
+		printf("(ERROR) read_metadata_filedb: Metadata is not initialised\n");
+		return NULL;
+	}
+	if (archive == NULL)
+	{
+		printf("(ERROR) read_metadata_filedb: Archive is a NULL Pointer\n");
+		return NULL;
+	}
+
+	TARIM_FILESAVE* fileFolderObjects = NULL;
+	long int fileFolderObjectsSize = -1;
+
+	// Read Metadata
+	fread(&meta, sizeof(TARIM_METADATA), 1, archive);
+
+	fileFolderObjectsSize = meta->numFile + meta->numFolder;
+	fileFolderObjects = (TARIM_FILESAVE* ) calloc(fileFolderObjectsSize, sizeof(TARIM_FILESAVE));
+	if (fileFolderObjects == NULL)
+	{
+		printf("(ERROR) read_metadata_filedb: Failed to allocate memory to fileFolderObjects Array\n");
+		return NULL;
+	}
+
+	// Read File and Folder Metadata
+	for (long int itr = 0; itr < fileFolderObjectsSize; itr++)
+	{
+		fread(&fileFolderObjects[itr], sizeof(TARIM_FILESAVE), 1, archive);
+	}
+
+	return fileFolderObjects;
 }
 
 // Write File Database and Archive

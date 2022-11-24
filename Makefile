@@ -11,16 +11,20 @@ else
 	EXEC=tam.x86
 endif
 
-all: libtarim $(EXEC)
+# Object Sets
+LIBOBJ=src/lib-src/crypt.o src/lib-src/func.o src/lib-src/readwrite.o
+TAMOBJ=
+
+all: lib $(EXEC)
 
 # Library Compile Rules
-libtarim: src/lib-src/libtarim.o src/libtarim.h
-	@echo "=> $(CC) $(CCFLAGS) -fPIC -shared src/lib-src/libtarim.o -o libtarim.so $(CCLIBS)"
-	$(shell $(CC) $(CCFLAGS) -fPIC -shared src/lib-src/libtarim.o -o libtarim.so $(CCLIBS))
+lib: $(LIBOBJ) src/libtarim.h
+	@echo "=> $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS)"
+	$(shell $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS))
 	@echo "Library Compiled!"
 
 # Executable Compile Rules
-$(EXEC):
+$(EXEC): $(TAMOBJ) src/libtarim.h
 	@echo "Dummy Rule"
 
 # Object Rules
@@ -36,6 +40,8 @@ run: libtarim
 
 # Clean Rules
 clean:
-	$(shell rm src/lib-src/*.o libtarim.so)
+	$(shell rm src/lib-src/*.o)
+	$(shell rm libtarim.so)
+	$(shell rm src/tam-src/*.o)
 	$(shell rm $(EXEC))
 	@echo "Project Cleaned!"

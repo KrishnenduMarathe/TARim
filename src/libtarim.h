@@ -26,11 +26,11 @@
 #define CLEARSCREEN "clear" // Linux
 
 // File Save Types
-#ifndef FILESAVE_TYPES
-#define FILESAVE_TYPES
+#ifndef TARIM_FILESAVE_TYPES
+#define TARIM_FILESAVE_TYPES
 #define FS_FILE 1
 #define FS_FOLDER 2
-#endif // FILESAVE_TYPES
+#endif // TARIM_FILESAVE_TYPES
 
 // Max Characters for File Path (OS Dependent)
 #ifndef FILEPATH_MAX_LEN
@@ -51,7 +51,7 @@ typedef enum {
 	AES_256_CBC,
 	ARIA_256_CBC,
 	CAMELLIA_256_CBC
-} CRYPT_MODES;
+} TARIM_CRYPT_MODES;
 
 typedef struct
 {
@@ -67,14 +67,14 @@ typedef struct
 	
 	uint8_t iv_size; // IV Size
 	unsigned char iv[256]; // IV
-} METADATA;
+} TARIM_METADATA;
 
 typedef struct
 {
 	uint8_t type;
 	char fpath[FP_MAX+1]; // File Path
 	unsigned long int fsize; // Size of the File
-} FILESAVE;
+} TARIM_FILESAVE;
 
 #endif // LIBTARIM_STRUCT
 
@@ -82,37 +82,47 @@ typedef struct
 //** FUNCTION PROTOTYPES |
 //***********************+
 
-// Get Password
-static void get_password(char*);
-
-// Count Directories and Files
-static void count_filefolder(char*, METADATA*);
-
-// Identify Directory
-int isDir(const char*);
-
-// Identify Regular File
-int isReg(const char*);
-
-// Save File Structure Element
-void saveFileELement(char*, FILE*, uint8_t);
-
-// Populate Metadata
-int update_write_metadata(METADATA*, CRYPT_MODES, int, char**, FILE*);
-
-// Generate 256 bit key
-int gen_256_key(unsigned char**, void(*)(char*));
-
-// Generate 16 bit Initialization Vector
-int gen_16_iv(unsigned char**);
+// ###########
+// # crypt.c #
+// ###########
 
 // Encrypt File using AES-256
 int crypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*, int);
-
 // Encrypt File using ARIA-256
 int crypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*, int);
-
 // Encrypt File using Camellia-256
 int crypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*, int);
+
+// ##########
+// # func.c #
+// ##########
+
+// Get Password
+static void get_password(char*);
+// Generate 128 bit Initialization Vector
+int gen_128_iv(unsigned char*);
+// Generate 256 bit key
+int gen_256_key(unsigned char**, void (*)(char*));
+// Write Raw data from one to other
+int nocrypt_write(FILE*, FILE*);
+
+// ###############
+// # readwrite.c #
+// ###############
+
+// Identify Directory
+static int isDir(const char*);
+// Identify Regular File
+static int isReg(const char*);
+// Count Directories and Files
+static void count_filefolder(char*, TARIM_METADATA*);
+// Populate Tarim Filesave structure to an array
+static void recursiveFilesaveArray(char*, long int*, TARIM_FILESAVE*);
+// Gather Files and Folders Objects
+TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA, int, char**);
+// Populate Metadata
+int update_write_metadata(TARIM_METADATA*, TARIM_CRYPT_MODES, int, char**, FILE*);
+// Write File Database and Archive
+int write_archive(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*);
 
 #endif // LIBTARIM_H_

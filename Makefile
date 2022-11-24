@@ -32,7 +32,7 @@ $(EXEC):
 .PHONY: run
 run: libtarim
 	@echo "Running Executable..."
-	$(shell LD_LIBRARY_PATH="$(shell pwd);$LD_LIBRARY_PATH" ./$(EXEC))
+	$(shell LD_LIBRARY_PATH="$(shell pwd):$LD_LIBRARY_PATH" ./$(EXEC))
 
 # Clean Rules
 clean:

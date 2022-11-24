@@ -1,6 +1,10 @@
 #ifndef LIBTARIM_H_
 #define LIBTARIM_H_
 
+//*****************+
+//** PREPROCESSORS |
+//*****************+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +37,11 @@
 #define FILEPATH_MAX_LEN
 #define FP_MAX PATH_MAX /* Linux */
 #endif // FILEPATH_MAX_LEN
+
+
+//****************+
+//** C STRUCTURES |
+//****************+
 
 #ifndef LIBTARIM_STRUCT
 #define LIBTARIM_STRUCT
@@ -70,35 +79,32 @@ typedef struct
 #endif // LIBTARIM_STRUCT
 
 //***********************+
-//** Function Prototypes |
+//** FUNCTION PROTOTYPES |
 //***********************+
 
 // Get Password
 static void get_password(char*);
 
-// Identify Directory
-static int isDir(const char*);
-
-// Identify Regular File
-static int isReg(const char*);
-
 // Count Directories and Files
 static void count_filefolder(char*, METADATA*);
 
-// Save File Structure Element
-static void saveFileELement(char*, FILE*, uint8_t);
+// Identify Directory
+int isDir(const char*);
 
-// Write File-Folder Database ;)
-static void write_filefolder_db(char*, METADATA*, FILE*, char**, char**, unsigned int*, unsigned int*);
+// Identify Regular File
+int isReg(const char*);
+
+// Save File Structure Element
+void saveFileELement(char*, FILE*, uint8_t);
 
 // Populate Metadata
-int update_write_metadata(char*, METADATA*, CRYPT_MODES, int, char**, FILE*, char**, char**);
+int update_write_metadata(METADATA*, CRYPT_MODES, int, char**, FILE*);
 
 // Generate 256 bit key
-int gen_256_key(unsigned char*, void(*)(char*));
+int gen_256_key(unsigned char**, void(*)(char*));
 
 // Generate 16 bit Initialization Vector
-int gen_16_iv(unsigned char*);
+int gen_16_iv(unsigned char**);
 
 // Encrypt File using AES-256
 int crypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*, int);

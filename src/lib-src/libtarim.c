@@ -8,22 +8,6 @@ static void get_password(char* passwd)
 	system(CLEARSCREEN);
 }
 
-// Identify Directory
-static int isDir(const char* filePath)
-{
-	struct stat path;
-	stat(filePath, &path);
-	return S_ISDIR(path.st_mode);
-}
-
-// Identify Regular File
-static int isReg(const char* filePath)
-{
-	struct stat path;
-	stat(filePath, &path);
-	return S_ISREG(path.st_mode);
-}
-
 // Count Directories and Files
 static void count_filefolder(char* basePath, METADATA* meta)
 {
@@ -62,8 +46,24 @@ static void count_filefolder(char* basePath, METADATA* meta)
 	closedir(dir);
 }
 
+// Identify Directory
+int isDir(const char* filePath)
+{
+	struct stat path;
+	stat(filePath, &path);
+	return S_ISDIR(path.st_mode);
+}
+
+// Identify Regular File
+int isReg(const char* filePath)
+{
+	struct stat path;
+	stat(filePath, &path);
+	return S_ISREG(path.st_mode);
+}
+
 // Save File Structure Element
-static void saveFileELement(char* filePath, FILE* archive, uint8_t ftype)
+void saveFileELement(char* filePath, FILE* archive, uint8_t ftype)
 {
 	FILESAVE fsave;
 	fsave.type = ftype;
@@ -87,93 +87,12 @@ static void saveFileELement(char* filePath, FILE* archive, uint8_t ftype)
 	fwrite(&fsave, sizeof(FILESAVE), 1, archive);
 }
 
-// Write File-Folder Database ;)
-static void write_filefolder_db(char*basePath, METADATA* meta, FILE* archive, char** filePaths, char** folderPaths, unsigned int* filec, unsigned int* folderc)
-{
-	if (meta == NULL)
-	{
-		printf("(ERROR) write_filefolder_db: No Metadata was passed\n");
-		return;
-	}
-	if (filePaths == NULL || folderPaths == NULL)
-	{
-		printf("(ERROR) write_filefolder_db: filePaths and/or folderPaths not allocated. Call update_write_metadata before me\n");
-		return;
-	}
-	if (archive == NULL)
-	{
-		printf("(ERROR) write_filefolder_db: Archive is a NULL Pointer\n");
-		return;
-	}
-
-	char *path;
-	struct dirent *dp;
-	
-	DIR *dir = opendir(basePath);
-	if (!dir) { return; }
-
-	while ((dp = readdir(dir)) != NULL)
-	{
-		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
-		{
-			path = (char*) malloc(FP_MAX+1);
-			if (path == NULL)
-			{
-				printf("(ERROR) write_filefolder_db: Cannot allocate memory to character array\n");
-				return;
-			}
-
-			strcpy(path, basePath);
-			strcat(path, "/");
-			strcat(path, dp->d_name);
-
-			path[(sizeof(basePath)+sizeof("/")+sizeof(dp->d_name)) / sizeof(char)] = '\0';
-
-			if (isDir(path))
-			{
-				int flag = 1;
-				for (unsigned int itr = 0; itr < *folderc; itr++)
-				{
-					if (strcmp(folderPaths[itr], path) == 0)
-					{
-						flag = 0;
-						break;
-					}
-				}
-				if (flag == 1)
-				{
-					saveFileELement(path, archive, FS_FOLDER);
-					strcpy(folderPaths[*folderc], path);
-					*folderc += 1;
-				}
-			}
-
-			if (isReg(path))
-			{
-				saveFileELement(path, archive, FS_FILE);
-				strcpy(filePaths[*filec], path);
-				*filec += 1;
-			}
-			
-			write_filefolder_db(path, meta, archive, filePaths, folderPaths, filec, folderc);
-			free(path);
-		}
-	}
-
-	closedir(dir);
-}
-
 // Populate Metadata
-int update_write_metadata(char* basePath, METADATA* meta, CRYPT_MODES mode, int arg_num, char** args, FILE* archive, char** filePaths, char** folderPaths)
+int update_write_metadata(METADATA* meta, CRYPT_MODES mode, int arg_num, char** args, FILE* archive)
 {
 	if (meta == NULL)
 	{
 		printf("(ERROR) update_write_metadata: No Metadata was passed\n");
-		return 1;
-	}
-	if (filePaths != NULL || folderPaths != NULL)
-	{
-		printf("(ERROR) update_write_metadata: filePaths and/or folderPaths pre-allocated\n");
 		return 1;
 	}
 	if (archive == NULL)
@@ -192,6 +111,7 @@ int update_write_metadata(char* basePath, METADATA* meta, CRYPT_MODES mode, int 
 
 	for (unsigned int itr = 0; itr < arg_num; itr++)
 	{
+
 		if (isDir(args[itr])) { meta->numFolder += 1; }
 		if (isReg(args[itr])) { meta->numFile += 1; }
 		
@@ -200,89 +120,13 @@ int update_write_metadata(char* basePath, METADATA* meta, CRYPT_MODES mode, int 
 
 	// Write Metadata
 	fwrite(meta, sizeof(METADATA), 1, archive);
-
-	// Allocate Folder and File Path Arrays
-	filePaths = (char**) malloc(sizeof(char*) * meta->numFile);
-	folderPaths = (char**) malloc(sizeof(char*) * meta->numFolder);
-	if (filePaths == NULL || folderPaths == NULL)
-	{
-		printf("(ERROR) update_write_metadata: Failed to allocate memory to filePaths and/or folderPaths\n");
-		if (filePaths != NULL) { free(filePaths); }
-		if (folderPaths != NULL) { free(folderPaths); }
-		return 1;
-	}
-
-	unsigned int max_num = meta->numFile >= meta->numFolder? meta->numFile : meta->numFolder;
-	for (unsigned int itr = 0; itr < max_num; itr++)
-	{
-		if (itr < meta->numFile)
-		{
-			filePaths[itr] = (char*) malloc(sizeof(char) * (FP_MAX+1));
-			if (filePaths[itr] == NULL)
-			{
-				for (unsigned int itr2 = 0; itr2 < itr; itr2++)
-				{
-					free(filePaths[itr2]);
-					free(folderPaths[itr2]);
-				}
-				free(filePaths);
-				free(folderPaths);
-
-				printf("(ERROR) update_write_metadata: Failed to allocate memory to file path(%u)\n", itr);
-				return 1;
-			}
-		}
-		if (itr < meta->numFolder)
-		{
-			folderPaths[itr] = (char*) malloc(sizeof(char) * (FP_MAX+1));
-			if (folderPaths[itr] == NULL)
-			{
-				for (unsigned int itr2 = 0; itr2 < itr; itr2++)
-				{
-					free(filePaths[itr2]);
-					free(folderPaths[itr2]);
-				}
-				free(filePaths);
-				free(folderPaths);
-
-				printf("(ERROR) update_write_metadata: Failed to allocate memory to folder path(%u)\n", itr);
-				return 1;
-			}
-		}
-	}
-
-	// Populate Folder and File Path Arrays with Arguments
-	// Also save them
-	unsigned int filec = 0, folderc = 0;
-	for (unsigned int itr = 0; itr < arg_num; itr++)
-	{
-		if (isDir(args[itr]))
-		{
-			saveFileELement(args[itr], archive, FS_FOLDER);
-			strcpy(folderPaths[folderc], args[itr]);
-			folderc++;
-		}
-		if (isReg(args[itr]))
-		{
-			saveFileELement(args[itr], archive, FS_FILE);
-			strcpy(filePaths[filec], args[itr]);
-			filec++;
-		}
-		write_filefolder_db(args[itr], meta, archive, filePaths, folderPaths, &filec, &folderc);
-	}
-
-	// Free Unneeded memory
-	for (unsigned int itr = 0; itr < meta->numFolder; itr++)
-	{ free(folderPaths[itr]); }
-	free(folderPaths);
-
 	return 0;
 }
 
 // Generate 256 bit key
-int gen_256_key(unsigned char* key, void (*get_pass)(char*))
+int gen_256_key(unsigned char** key, void (*get_pass)(char*))
 {
-	if (key != NULL)
+	if (*key != NULL)
 	{
 		printf("(ERROR) gen_256_key: key passed is pre-allocated\n");
 		return 1;
@@ -321,8 +165,8 @@ int gen_256_key(unsigned char* key, void (*get_pass)(char*))
 	}
 
 	int keyLen = EVP_MD_get_size(sha256);
-	key = malloc(sizeof(unsigned char) * keyLen);
-	if (key == NULL)
+	*key = (unsigned char *) malloc(sizeof(unsigned char) * keyLen);
+	if (*key == NULL)
 	{
 		printf("(ERROR) gen_256_key: Failed to allocate memory\n");
 
@@ -335,7 +179,7 @@ int gen_256_key(unsigned char* key, void (*get_pass)(char*))
 	{
 		printf("(ERROR) gen_256_key: Failed to Initiate digest. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(key);
+		free(*key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
 		return 1;
@@ -344,16 +188,16 @@ int gen_256_key(unsigned char* key, void (*get_pass)(char*))
 	{
 		printf("(ERROR) gen_256_key: Failed to update digest. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(key);
+		free(*key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
 		return 1;
 	}
-	if (!EVP_DigestFinal_ex(k_ctx, key, &passLen))
+	if (!EVP_DigestFinal_ex(k_ctx, *key, &passLen))
 	{
 		printf("(ERROR) gen_256_key: Failed to digest final block. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(key);
+		free(*key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
 		return 1;
@@ -365,25 +209,25 @@ int gen_256_key(unsigned char* key, void (*get_pass)(char*))
 }
 
 // Generate 16 bit Initialization Vector
-int gen_16_iv(unsigned char* iv)
+int gen_16_iv(unsigned char** iv)
 {
-	if (iv != NULL)
+	if (*iv != NULL)
 	{
 		printf("(ERROR) gen_16_iv: iv passed is pre-allocated\n");
 		return 1;
 	}
 
-	iv = malloc(sizeof(unsigned char) * 16);
-	if (iv == NULL)
+	*iv = (unsigned char*) malloc(sizeof(unsigned char) * 16);
+	if (*iv == NULL)
 	{
 		printf("(ERROR) gen_16_iv: Failed to allocate memory\n");
 		return 1;
 	}
 
-	if (!RAND_bytes(iv, sizeof(iv)))
+	if (!RAND_bytes(*iv, sizeof(*iv)))
 	{
 		printf("(ERROR) gen_16_iv: Failed to generate iv\n");
-		free(iv);
+		free(*iv);
 		return 1;
 	}
 

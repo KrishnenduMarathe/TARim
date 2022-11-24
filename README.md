@@ -36,4 +36,4 @@
 		[OPEN YOUR SHELLS CONFIGURATION FILE IN YOUR HOME DIRECTORY LIKE .bashrc / .zshrc and add following lines]
 		
 		export PATH=PATH=$PATH:<Path to the cloned directory>
-		export LD_LIBRARY_PATH=<Path to the cloned directory>;$LD_LIBRARY_PATH
+		export LD_LIBRARY_PATH=<Path to the cloned directory>:$LD_LIBRARY_PATH

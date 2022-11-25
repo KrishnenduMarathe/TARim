@@ -251,7 +251,7 @@ TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 	long int fileFolderObjectsSize = -1;
 
 	// Read Metadata
-	fread(&meta, sizeof(TARIM_METADATA), 1, archive);
+	fread(meta, sizeof(TARIM_METADATA), 1, archive);
 
 	fileFolderObjectsSize = meta->numFile + meta->numFolder;
 	fileFolderObjects = (TARIM_FILESAVE* ) calloc(fileFolderObjectsSize, sizeof(TARIM_FILESAVE));
@@ -312,6 +312,9 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		}
 
 		// Write File Data to the Archive
+		if (meta.encrypt != NO_ENCRYPT)
+		{ printf("(ERROR) write_archive: NULL key passed for encryption\n"); }
+		
 		switch (meta.encrypt)
 		{
 		case NO_ENCRYPT:

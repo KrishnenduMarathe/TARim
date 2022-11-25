@@ -17,11 +17,17 @@ TAMOBJ=
 
 all: lib $(EXEC)
 
-# Library Compile Rules
+# Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h
 	@echo "=> $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS)"
 	$(shell $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS))
-	@echo "Library Compiled!"
+	@echo "(release) Library Compiled!"
+
+# Library Debug Compile Rules
+lib-dbg: src/libtarim.h
+	@echo "=> $(CC) $(CCFLAGS) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS)"
+	$(shell $(CC) $(CCFLAGS) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS))
+	@echo "(release) Library Compiled!"
 
 # Executable Compile Rules
 $(EXEC): $(TAMOBJ) src/libtarim.h
@@ -41,7 +47,7 @@ run: libtarim
 # Clean Rules
 clean:
 	$(shell rm src/lib-src/*.o)
-	$(shell rm libtarim.so)
+	$(shell rm libtarim.so libtarim-dbg.so)
 	$(shell rm src/tam-src/*.o)
 	$(shell rm $(EXEC))
 	@echo "Project Cleaned!"

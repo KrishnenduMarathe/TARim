@@ -1,4 +1,4 @@
-#include "src/libtarim.h"
+#include "../libtarim.h"
 
 int main(int argc, char** argv)
 {

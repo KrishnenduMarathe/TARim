@@ -82,16 +82,27 @@ typedef struct
 //** FUNCTION PROTOTYPES |
 //***********************+
 
-// ###########
-// # crypt.c #
-// ###########
+// #############
+// # decrypt.c #
+// #############
+
+// Decrypt File using AES-256
+int decrypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+// Decrypt File using ARIA-256
+int decrypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+// Decrypt File using Camellia-256
+int decrypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+
+// #############
+// # encrypt.c #
+// #############
 
 // Encrypt File using AES-256
-int crypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*, int);
+int encrypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*);
 // Encrypt File using ARIA-256
-int crypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*, int);
+int encrypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*);
 // Encrypt File using Camellia-256
-int crypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*, int);
+int encrypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*);
 
 // ##########
 // # func.c #
@@ -117,7 +128,7 @@ static int isReg(const char*);
 // Count Directories and Files
 static void count_filefolder(char*, TARIM_METADATA*);
 // Populate Tarim Filesave structure to an array
-static void recursiveFilesaveArray(char*, long int*, TARIM_FILESAVE*);
+static void recursiveFilesaveArray(char*, long long int*, TARIM_FILESAVE*);
 // Gather Files and Folders Objects
 TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA, int, char**);
 // Populate Metadata
@@ -126,5 +137,7 @@ int update_write_metadata(TARIM_METADATA*, TARIM_CRYPT_MODES, int, char**, FILE*
 TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA*, FILE*);
 // Write File Database and Archive
 int write_archive(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*);
+// Extract File from Archie
+int extract_file(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*, long long int);
 
 #endif // LIBTARIM_H_

@@ -1,24 +1,24 @@
 #include "../libtarim.h"
 
 // Encrypt File using AES-256
-int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, int enc)
+int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
-		printf("(ERROR) crypt_aes256: One/more parameters are NULL pointers\n");
+		printf("(ERROR) encrypt_aes256: One/more parameters are NULL pointers\n");
 		return 1;
 	}
 
 	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
 	{
-		printf("(ERROR) crypt_aes256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aes256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		return 1;
 	}
 	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "AES-256-CBC", NULL);
 	if (cipher == NULL)
 	{
-		printf("(ERROR) crypt_aes256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aes256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
@@ -28,9 +28,9 @@ int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char*
 	int block_size = EVP_CIPHER_block_size(cipher);
 	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
 	
-	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
-		printf("(ERROR) crypt_aes256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aes256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -42,9 +42,9 @@ int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char*
 	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
-	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, 1, NULL))
 	{
-		printf("(ERROR) crypt_aes256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aes256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -58,7 +58,7 @@ int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char*
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
-			printf("(ERROR) crypt_aes256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) encrypt_aes256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			
 			EVP_CIPHER_free(cipher);
 			EVP_CIPHER_CTX_free(ctx);
@@ -74,7 +74,7 @@ int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char*
 	// Cipher Final block with padding
 	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
 	{
-		printf("(ERROR) crypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -90,24 +90,24 @@ int crypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char*
 }
 
 // Encrypt File using ARIA-256
-int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, int enc)
+int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
-		printf("(ERROR) crypt_aria256: One/more parameters are NULL pointers\n");
+		printf("(ERROR) encrypt_aria256: One/more parameters are NULL pointers\n");
 		return 1;
 	}
 
 	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
 	{
-		printf("(ERROR) crypt_aria256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aria256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		return 1;
 	}
 	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "ARIA-256-CBC", NULL);
 	if (cipher == NULL)
 	{
-		printf("(ERROR) crypt_aria256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aria256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
@@ -117,9 +117,9 @@ int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char
 	int block_size = EVP_CIPHER_block_size(cipher);
 	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
 	
-	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
-		printf("(ERROR) crypt_aria256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aria256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -131,9 +131,9 @@ int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char
 	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
-	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, 1, NULL))
 	{
-		printf("(ERROR) crypt_aria256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aria256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -147,7 +147,7 @@ int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
-			printf("(ERROR) crypt_aria256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) encrypt_aria256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			
 			EVP_CIPHER_free(cipher);
 			EVP_CIPHER_CTX_free(ctx);
@@ -163,7 +163,7 @@ int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char
 	// Cipher Final block with padding
 	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
 	{
-		printf("(ERROR) crypt_aria256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_aria256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -179,24 +179,24 @@ int crypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char
 }
 
 // Encrypt File using Camellia-256
-int crypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, int enc)
+int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
-		printf("(ERROR) crypt_camellia256: One/more parameters are NULL pointers\n");
+		printf("(ERROR) encrypt_camellia256: One/more parameters are NULL pointers\n");
 		return 1;
 	}
 
 	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
 	{
-		printf("(ERROR) crypt_camellia256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_camellia256: Failed to generate cipher context. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		return 1;
 	}
 	EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "CAMELLIA-256-CBC", NULL);
 	if (cipher == NULL)
 	{
-		printf("(ERROR) crypt_camellia256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_camellia256: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
@@ -206,9 +206,9 @@ int crypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned 
 	int block_size = EVP_CIPHER_block_size(cipher);
 	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
 	
-	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
-		printf("(ERROR) crypt_camellia256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_camellia256: Failed to Initiate Cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -220,9 +220,9 @@ int crypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned 
 	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
-	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, enc, NULL))
+	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, 1, NULL))
 	{
-		printf("(ERROR) crypt_camellia256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_camellia256: Failed to set key and iv. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
@@ -236,7 +236,7 @@ int crypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned 
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
-			printf("(ERROR) crypt_camellia256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) encrypt_camellia256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			
 			EVP_CIPHER_free(cipher);
 			EVP_CIPHER_CTX_free(ctx);
@@ -252,7 +252,7 @@ int crypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned 
 	// Cipher Final block with padding
 	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
 	{
-		printf("(ERROR) crypt_camellia256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+		printf("(ERROR) encrypt_camellia256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);

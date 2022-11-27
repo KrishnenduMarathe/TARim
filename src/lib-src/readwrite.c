@@ -365,6 +365,11 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		printf("(ERROR) extract_file: File Index out of bounds\n");
 		return 1;
 	}
+	if (fArray[option_num].type == FS_FOLDER)
+	{
+		printf("(ERROR) extract_file: Invalid Object type passed for extaction\n");
+		return 1;
+	}
 
 	// Gather IV from metadata
 	unsigned char iv[meta.iv_size];

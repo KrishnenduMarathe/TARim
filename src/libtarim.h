@@ -116,6 +116,8 @@ int gen_128_iv(unsigned char*);
 int gen_256_key(unsigned char**, void (*)(char*));
 // Write Raw data from one to other
 int nocrypt_write(FILE*, FILE*);
+// Write Raw data from archive
+int nocrypt_extractfile(FILE*, FILE*, unsigned long long int, unsigned long int);
 
 // ###############
 // # readwrite.c #

@@ -16,7 +16,7 @@ LIBOBJ=src/lib-src/decrypt.o src/lib-src/encrypt.o src/lib-src/func.o src/lib-sr
 TAMOBJ=src/tam-src/main.o
 
 release: lib exec
-debug: lib-dbg exec-dbg
+debug: clean lib-dbg exec-dbg
 
 # Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h

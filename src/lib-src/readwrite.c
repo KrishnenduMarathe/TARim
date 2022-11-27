@@ -302,7 +302,7 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		{ continue; }
 
 		// STDOUT Message
-		printf("-> (write_archive) Writing '%s'\n", fArray[itr].fpath);
+		printf("-> (write_archive) Reading '%s'\n", fArray[itr].fpath);
 		
 		infile = fopen(fArray[itr].fpath, "rb");
 		if (infile == NULL)
@@ -312,8 +312,12 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		}
 
 		// Write File Data to the Archive
-		if (meta.encrypt != NO_ENCRYPT)
-		{ printf("(ERROR) write_archive: NULL key passed for encryption\n"); }
+		if (meta.encrypt != NO_ENCRYPT && key == NULL)
+		{
+			printf("(ERROR) write_archive: NULL key passed for encryption\n");
+			fclose(infile);
+			return 1;
+		}
 		
 		switch (meta.encrypt)
 		{
@@ -348,17 +352,17 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 {
 	if (fArray == NULL)
 	{
-		printf("(ERROR) extract_archive: File-Folder Object array is NULL Pointer\n");
+		printf("(ERROR) extract_file: File-Folder Object array is NULL Pointer\n");
 		return 1;
 	}
 	if (archive == NULL)
 	{
-		printf("(ERROR) extract_archive: Archive is a NULL Pointer\n");
+		printf("(ERROR) extract_file: Archive is a NULL Pointer\n");
 		return 1;
 	}
 	if (option_num < 0 || option_num >= meta.numFile+meta.numFolder)
 	{
-		printf("(ERROR) extract_archive: File Index out of bounds\n");
+		printf("(ERROR) extract_file: File Index out of bounds\n");
 		return 1;
 	}
 
@@ -366,7 +370,7 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	unsigned char iv[meta.iv_size];
 	strncpy(iv, meta.iv, meta.iv_size);
 
-	// Get Cipher Block Size //int block_size = EVP_CIPHER_block_size(cipher);
+	// Get Cipher Block Size
 	unsigned int block_size;
 	EVP_CIPHER* cipher;
 	switch (meta.encrypt)
@@ -380,7 +384,7 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		cipher = EVP_CIPHER_fetch(NULL, "AES-256-CBC", NULL);
 		if (cipher == NULL)
 		{
-			printf("(ERROR) extract_archive: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) extract_file: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			return 1;
 		}
 		block_size = EVP_CIPHER_block_size(cipher);
@@ -392,7 +396,7 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		cipher = EVP_CIPHER_fetch(NULL, "ARIA-256-CBC", NULL);
 		if (cipher == NULL)
 		{
-			printf("(ERROR) extract_archive: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) extract_file: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			return 1;
 		}
 		block_size = EVP_CIPHER_block_size(cipher);
@@ -404,7 +408,7 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		cipher = EVP_CIPHER_fetch(NULL, "CAMELLIA-256-CBC", NULL);
 		if (cipher == NULL)
 		{
-			printf("(ERROR) extract_archive: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			printf("(ERROR) extract_file: Failed to fetch cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 			return 1;
 		}
 		block_size = EVP_CIPHER_block_size(cipher);
@@ -431,7 +435,48 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		}
 	}
 
-	//
+	// Create Directory Structre necessary for extraction
 
+	// STDOUT Message
+	printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);
+
+	FILE* outfile = fopen(fArray[option_num].fpath, "wb");
+	if (outfile == NULL)
+	{
+		printf("(ERROR) extract_file: Failed to open file '%s'\n", fArray[option_num].fpath);
+		return 1;
+	}
+	
+	// Start Extraction of the file
+	if (meta.encrypt != NO_ENCRYPT && key == NULL)
+	{
+		printf("(ERROR) extract_file: NULL key passed for decryption\n");
+		fclose(outfile);
+		return 1;
+	}
+	
+	switch (meta.encrypt)
+	{
+	case NO_ENCRYPT:
+		if (nocrypt_extractfile(archive, outfile, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		break;
+		
+	case AES_256_CBC:
+		if (decrypt_aes256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		break;
+		
+	case ARIA_256_CBC:
+		if (decrypt_aria256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		break;
+
+	case CAMELLIA_256_CBC:
+		if (decrypt_camellia256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		break;
+	
+	default:
+		break;
+	}
+
+	fclose(outfile);
 	return 0;
 }

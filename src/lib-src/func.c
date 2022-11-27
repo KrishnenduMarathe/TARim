@@ -110,13 +110,36 @@ int nocrypt_write(FILE* infile, FILE* outfile)
 {
 	if (infile == NULL || outfile == NULL )
 	{
-		printf("(ERROR) nocrypt_write: One more parameters are NULL pointers\n");
+		printf("(ERROR) nocrypt_write: One/more parameters are NULL pointers\n");
 		return 1;
 	}
 
 	unsigned char buffer;
 	while (fread(&buffer, sizeof(unsigned char), 1, infile) == 1)
 	{ fwrite(&buffer, sizeof(unsigned char), 1, outfile); }
+
+	return 0;
+}
+
+// Write Raw data from archive
+int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize)
+{
+	if (infile == NULL || outfile == NULL)
+	{
+		printf("(ERROR) nocrypt_extractfile: One/more parameters are NULL pointers\n");
+		return 1;
+	}
+
+	// Seek to File Location
+	fseek(infile, fileLoc, SEEK_SET);
+
+	unsigned char buffer;
+	unsigned long long int b_count = 0;
+	while (fread(&buffer, sizeof(unsigned char), 1, infile) == 1)
+	{
+		fwrite(&buffer, sizeof(unsigned char), 1, outfile);
+		if (b_count >= fileSize) { break; }
+	}
 
 	return 0;
 }

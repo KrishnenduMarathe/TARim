@@ -87,59 +87,59 @@ typedef struct
 // #############
 
 // Decrypt File using AES-256
-int decrypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 // Decrypt File using ARIA-256
-int decrypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 // Decrypt File using Camellia-256
-int decrypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*, unsigned long long int, unsigned long int);
+int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 
 // #############
 // # encrypt.c #
 // #############
 
 // Encrypt File using AES-256
-int encrypt_aes256(FILE*, FILE*, unsigned char*, unsigned char*);
+int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 // Encrypt File using ARIA-256
-int encrypt_aria256(FILE*, FILE*, unsigned char*, unsigned char*);
+int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 // Encrypt File using Camellia-256
-int encrypt_camellia256(FILE*, FILE*, unsigned char*, unsigned char*);
+int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 
 // ##########
 // # func.c #
 // ##########
 
 // Get Password
-static void get_password(char*);
+static void get_password(char* passwd);
 // Generate 128 bit Initialization Vector
-int gen_128_iv(unsigned char*);
+int gen_128_iv(unsigned char* iv);
 // Generate 256 bit key
-int gen_256_key(unsigned char**, void (*)(char*));
+int gen_256_key(unsigned char** key, void (*get_pass)(char*));
 // Write Raw data from one to other
-int nocrypt_write(FILE*, FILE*);
+int nocrypt_write(FILE* infile, FILE* outfile);
 // Write Raw data from archive
-int nocrypt_extractfile(FILE*, FILE*, unsigned long long int, unsigned long int);
+int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize);
 
 // ###############
 // # readwrite.c #
 // ###############
 
 // Identify Directory
-static int isDir(const char*);
+static int isDir(const char* filePath);
 // Identify Regular File
-static int isReg(const char*);
+static int isReg(const char* filePath);
 // Count Directories and Files
-static void count_filefolder(char*, TARIM_METADATA*);
+static void count_filefolder(char* basePath, TARIM_METADATA* meta);
 // Populate Tarim Filesave structure to an array
-static void recursiveFilesaveArray(char*, long long int*, TARIM_FILESAVE*);
+static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILESAVE* fArray);
 // Gather Files and Folders Objects
-TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA, int, char**);
+TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args);
 // Populate Metadata
-int update_write_metadata(TARIM_METADATA*, TARIM_CRYPT_MODES, int, char**, FILE*);
+int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_num, char** args, FILE* archive);
 // Read Metadata and File Database
-TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA*, FILE*);
-// Write File Database and Archive
-int write_archive(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*);
+TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive);
+// Write File Database and File Data in Archive
+int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key);
 // Extract File from Archie
-int extract_file(const TARIM_METADATA, const TARIM_FILESAVE*, FILE*, unsigned char*, long long int);
+int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num);
 
 #endif // LIBTARIM_H_

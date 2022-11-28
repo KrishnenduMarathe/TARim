@@ -111,9 +111,9 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 // Get Password
 static void get_password(char* passwd);
 // Generate 128 bit Initialization Vector
-int gen_128_iv(unsigned char* iv);
+unsigned char* gen_128_iv();
 // Generate 256 bit key
-int gen_256_key(unsigned char** key, void (*get_pass)(char*));
+unsigned char* gen_256_key(void (*get_pass)(char*));
 // Write Raw data from one to other
 int nocrypt_write(FILE* infile, FILE* outfile);
 // Write Raw data from archive

@@ -217,7 +217,10 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 	meta->numFile = 0;
 	meta->numFolder = 0;
 	meta->iv_size = 16;
-	if (gen_128_iv(meta->iv)) { return 1; }
+
+	unsigned char* iv = gen_128_iv();
+	if (iv == NULL) { return 1; }
+	strncpy(meta->iv, iv, meta->iv_size);
 
 	for (unsigned int itr = 0; itr < arg_num; itr++)
 	{

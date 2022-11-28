@@ -9,26 +9,27 @@ static void get_password(char* passwd)
 }
 
 // Generate 128 bit Initialization Vector
-int gen_128_iv(unsigned char* iv)
+unsigned char* gen_128_iv()
 {
+	unsigned char* iv = (unsigned char*) malloc(sizeof(unsigned char) * 16);
+	if (iv == NULL)
+	{
+		printf("(ERROR) gen_128_iv: Failed to Allocate memory to IV\n");
+		return NULL;
+	}
 	if (!RAND_bytes(iv, sizeof(iv)))
 	{
-		printf("(ERROR) gen_16_iv: Failed to generate iv\n");
-		return 1;
+		printf("(ERROR) gen_128_iv: Failed to generate iv\n");
+		free(iv);
+		return NULL;
 	}
 
-	return 0;
+	return iv;
 }
 
 // Generate 256 bit key
-int gen_256_key(unsigned char** key, void (*get_pass)(char*))
+unsigned char* gen_256_key(void (*get_pass)(char*))
 {
-	if (*key != NULL)
-	{
-		printf("(ERROR) gen_256_key: key passed is pre-allocated\n");
-		return 1;
-	}
-
 	// Get Password
 	int passLen = 0;
 	char password[1024];
@@ -50,7 +51,7 @@ int gen_256_key(unsigned char** key, void (*get_pass)(char*))
 	if (k_ctx == NULL)
 	{
 		printf("(ERROR) gen_256_key: Failed to generate context during key generation. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
-		return 1;
+		return NULL;
 	}
 	EVP_MD* sha256 = EVP_MD_fetch(NULL, "SHA256", NULL);
 	if (sha256 == NULL)
@@ -58,51 +59,52 @@ int gen_256_key(unsigned char** key, void (*get_pass)(char*))
 		printf("(ERROR) gen_256_key: Failed to fetch algorithm during key generation. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
 		EVP_MD_CTX_free(k_ctx);
-		return 1;
+		return NULL;
 	}
 
+	unsigned char* key;
 	int keyLen = EVP_MD_get_size(sha256);
-	*key = (unsigned char *) malloc(sizeof(unsigned char) * keyLen);
-	if (*key == NULL)
+	key = (unsigned char *) malloc(sizeof(unsigned char) * keyLen);
+	if (key == NULL)
 	{
 		printf("(ERROR) gen_256_key: Failed to allocate memory\n");
 
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
-		return 1;
+		return NULL;
 	}
 
 	if (!EVP_DigestInit_ex2(k_ctx, sha256, NULL))
 	{
 		printf("(ERROR) gen_256_key: Failed to Initiate digest. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(*key);
+		free(key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
-		return 1;
+		return NULL;
 	}
 	if (!EVP_DigestUpdate(k_ctx, password, sizeof(char) * passLen))
 	{
 		printf("(ERROR) gen_256_key: Failed to update digest. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(*key);
+		free(key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
-		return 1;
+		return NULL;
 	}
-	if (!EVP_DigestFinal_ex(k_ctx, *key, &passLen))
+	if (!EVP_DigestFinal_ex(k_ctx, key, &passLen))
 	{
 		printf("(ERROR) gen_256_key: Failed to digest final block. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 		
-		free(*key);
+		free(key);
 		EVP_MD_free(sha256);
 		EVP_MD_CTX_free(k_ctx);
-		return 1;
+		return NULL;
 	}
 	EVP_MD_free(sha256);
 	EVP_MD_CTX_free(k_ctx);
 
-	return 0;
+	return key;
 }
 
 // Write Raw data from one to other

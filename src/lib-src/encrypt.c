@@ -24,9 +24,11 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 		return 1;
 	}
 
-	int num_read, outLen;
+	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
+	const int inLen = 1024;
+	int outLen = 1024 + block_size;
+	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
@@ -38,8 +40,8 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	}
 
 	// Assert size of key and iv
-	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == sizeof(key)/sizeof(unsigned char));
-	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
+	//OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == sizeof(key)/sizeof(unsigned char));
+	//OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
 	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, 1, NULL))
@@ -54,7 +56,7 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	// Loop until bytes read
 	while (1)
 	{
-		num_read = fread(inbuffer, sizeof(unsigned char), 1024, infile);
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -67,7 +69,7 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (num_read < 1024)
+		if (num_read < inLen)
 		{ break; }
 	}
 
@@ -113,9 +115,11 @@ int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 		return 1;
 	}
 
-	int num_read, outLen;
+	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
+	const int inLen = 1024;
+	int outLen = 1024 + block_size;
+	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
@@ -143,7 +147,7 @@ int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 	// Loop until bytes read
 	while (1)
 	{
-		num_read = fread(inbuffer, sizeof(unsigned char), 1024, infile);
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -156,7 +160,7 @@ int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (num_read < 1024)
+		if (num_read < inLen)
 		{ break; }
 	}
 
@@ -202,9 +206,11 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 		return 1;
 	}
 
-	int num_read, outLen;
+	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	unsigned char inbuffer[1024], outbuffer[1024 + block_size]; // Allow space for additional block in outbuffer
+	const int inLen = 1024;
+	int outLen = 1024 + block_size;
+	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
 	{
@@ -232,7 +238,7 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 	// Loop until bytes read
 	while (1)
 	{
-		num_read = fread(inbuffer, sizeof(unsigned char), 1024, infile);
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -245,7 +251,7 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (num_read < 1024)
+		if (num_read < inLen)
 		{ break; }
 	}
 

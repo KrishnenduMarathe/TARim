@@ -40,8 +40,8 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	}
 
 	// Assert size of key and iv
-	//OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == sizeof(key)/sizeof(unsigned char));
-	//OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
+	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == 32);
+	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
 	if (!EVP_CipherInit_ex2(ctx, NULL, key, iv, 1, NULL))
@@ -131,7 +131,7 @@ int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 	}
 
 	// Assert size of key and iv
-	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == sizeof(key)/sizeof(unsigned char));
+	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == 32);
 	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv
@@ -222,7 +222,7 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 	}
 
 	// Assert size of key and iv
-	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == sizeof(key)/sizeof(unsigned char));
+	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == 32);
 	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
 
 	// Set key and iv

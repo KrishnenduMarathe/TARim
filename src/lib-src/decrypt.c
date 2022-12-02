@@ -61,7 +61,7 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	unsigned long long int b_count = 0;
 	while (1)
 	{
-		if (b_count + inLen > fileSize)
+		if (b_count + inLen >= fileSize)
 		{
 			num_read = fread(inbuffer, sizeof(unsigned char), fileSize - b_count, infile);
 		} else {
@@ -80,7 +80,7 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (num_read < inLen)
+		if (b_count >= fileSize)
 		{ break; }
 	}
 
@@ -159,23 +159,17 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
-	int loop_ok = 1;
+	int counter = 0;
 	unsigned long long int b_count = 0;
-	while (loop_ok)
+	while (1)
 	{
-		num_read = 0;
-		for (int i = 0; i < inLen; i++)
+		if (b_count + inLen >= fileSize)
 		{
-			num_read += fread(&inbuffer[i], sizeof(unsigned char), 1, infile);
-			b_count += 1;
-
-			// EOF Reached
-			if (b_count >= fileSize || feof(infile))
-			{
-				loop_ok = 0;
-				break;
-			}
+			num_read = fread(inbuffer, sizeof(unsigned char), fileSize - b_count, infile);
+		} else {
+			num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 		}
+		b_count += num_read;
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -186,6 +180,10 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 			return 1;
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
+
+		// EOF
+		if (b_count >= fileSize)
+		{ break; }
 	}
 
 	// Cipher Final block with padding

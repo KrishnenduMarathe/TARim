@@ -443,7 +443,24 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		}
 	}
 
-	// Create Directory Structre necessary for extraction
+	// Create Directory Structre necessary for extraction - sloppy
+	for (long long int itr = 0; itr <= option_num; itr++)
+	{
+		if (fArray[itr].type != FS_FOLDER)
+		{ continue; }
+
+		DIR* doesitexist = opendir(fArray[itr].fpath);
+		if (!doesitexist)
+		{
+			if (mkdir(fArray[itr].fpath, 0777))
+			{
+				printf("(ERROR) extract_file: Failed creating folder '%s'\n", fArray[itr].fpath);
+				closedir(doesitexist);
+				return 1;
+			}
+		}
+		closedir(doesitexist);
+	}
 
 	// STDOUT Message
 	printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);

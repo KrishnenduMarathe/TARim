@@ -32,11 +32,8 @@
 #define FS_FOLDER 2
 #endif // TARIM_FILESAVE_TYPES
 
-// Max Characters for File Path (OS Dependent)
-#ifndef FILEPATH_MAX_LEN
-#define FILEPATH_MAX_LEN
-#define FP_MAX PATH_MAX /* Linux */
-#endif // FILEPATH_MAX_LEN
+// Max Characters for File Path
+#define FP_MAX PATH_MAX 4096
 
 
 //****************+
@@ -59,7 +56,7 @@ typedef struct
 	
 	unsigned int version; // Version Number
 	unsigned int revision; // Revision Number
-	
+
 	uint8_t encrypt; // Encryption flag
 	
 	unsigned int numFile; // Number of Files
@@ -67,6 +64,7 @@ typedef struct
 	
 	uint8_t iv_size; // IV Size
 	unsigned char iv[256]; // IV
+	
 } TARIM_METADATA;
 
 typedef struct

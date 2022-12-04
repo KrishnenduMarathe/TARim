@@ -26,8 +26,8 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	const int inLen = 1024;
-	int outLen = 1024 + block_size;
+	const int inLen = block_size;
+	int outLen = block_size + block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -77,6 +77,12 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 			EVP_CIPHER_CTX_free(ctx);
 			return 1;
 		}
+		// DEBUG
+		if (b_count == num_read)
+		{
+			printf("First Buffer: size=%d\n\tData: %s\n\n", outLen, outbuffer);
+		}
+
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
@@ -89,10 +95,13 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	{
 		printf("(ERROR) decrypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
-		EVP_CIPHER_free(cipher);
+		/*EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
-		return 1;
+		return 1;*/
 	}
+	// DEBUG
+	printf("Last Buffer: size=%d\n\tData: %s\n\n", outLen, outbuffer);
+
 	fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 	// Clean up
@@ -128,8 +137,8 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	const int inLen = 1024;
-	int outLen = 1024 + block_size;
+	const int inLen = block_size;
+	int outLen = block_size + block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -230,8 +239,8 @@ int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	const int inLen = 1024;
-	int outLen = 1024 + block_size;
+	const int inLen = block_size;
+	int outLen = block_size + block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))

@@ -305,7 +305,7 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		{ continue; }
 
 		// STDOUT Message
-		printf("-> (write_archive) Reading '%s'\n", fArray[itr].fpath);
+		printf("-> (write_archive) Writing '%s'\n", fArray[itr].fpath);
 		
 		infile = fopen(fArray[itr].fpath, "rb");
 		if (infile == NULL)

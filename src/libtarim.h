@@ -33,8 +33,7 @@
 #endif // TARIM_FILESAVE_TYPES
 
 // Max Characters for File Path
-#define FP_MAX PATH_MAX 4096
-
+#define FP_MAX 4096
 
 //****************+
 //** C STRUCTURES |

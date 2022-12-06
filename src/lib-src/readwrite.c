@@ -479,6 +479,9 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		fclose(outfile);
 		return 1;
 	}
+
+	// DEBUG
+	printf("(DEBUG) extract_file: Filesize: %lu | StartLoc: %lu | RelLoc: %lu\n\n", fArray[option_num].fsize, startLoc, relativeLoc);
 	
 	switch (meta.encrypt)
 	{

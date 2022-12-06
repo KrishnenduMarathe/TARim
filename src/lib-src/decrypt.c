@@ -57,16 +57,10 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
-	int counter = 0;
 	unsigned long long int b_count = 0;
 	while (1)
 	{
-		if (b_count + inLen >= fileSize)
-		{
-			num_read = fread(inbuffer, sizeof(unsigned char), fileSize - b_count, infile);
-		} else {
-			num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
-		}
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 		b_count += num_read;
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
@@ -77,12 +71,6 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 			EVP_CIPHER_CTX_free(ctx);
 			return 1;
 		}
-		// DEBUG
-		if (b_count == num_read)
-		{
-			printf("First Buffer: size=%d\n\tData: %s\n\n", outLen, outbuffer);
-		}
-
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
@@ -95,13 +83,10 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 	{
 		printf("(ERROR) decrypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
-		/*EVP_CIPHER_free(cipher);
+		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
-		return 1;*/
+		return 1;
 	}
-	// DEBUG
-	printf("Last Buffer: size=%d\n\tData: %s\n\n", outLen, outbuffer);
-
 	fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 	// Clean up
@@ -168,16 +153,10 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
-	int counter = 0;
 	unsigned long long int b_count = 0;
 	while (1)
 	{
-		if (b_count + inLen >= fileSize)
-		{
-			num_read = fread(inbuffer, sizeof(unsigned char), fileSize - b_count, infile);
-		} else {
-			num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
-		}
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 		b_count += num_read;
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
@@ -270,23 +249,11 @@ int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
-	int loop_ok = 1;
 	unsigned long long int b_count = 0;
-	while (loop_ok)
+	while (1)
 	{
-		num_read = 0;
-		for (int i = 0; i < inLen; i++)
-		{
-			num_read += fread(&inbuffer[i], sizeof(unsigned char), 1, infile);
-			b_count += 1;
-
-			// EOF Reached
-			if (b_count >= fileSize || feof(infile))
-			{
-				loop_ok = 0;
-				break;
-			}
-		}
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
+		b_count += num_read;
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -297,6 +264,10 @@ int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 			return 1;
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
+
+		// EOF
+		if (b_count >= fileSize)
+		{ break; }
 	}
 
 	// Cipher Final block with padding

@@ -74,7 +74,7 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (b_count >= fileSize)
+		if (b_count >= fileSize || num_read < inLen)
 		{ break; }
 	}
 
@@ -170,7 +170,7 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (b_count >= fileSize)
+		if (b_count >= fileSize || num_read < inLen)
 		{ break; }
 	}
 
@@ -266,7 +266,7 @@ int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (b_count >= fileSize)
+		if (b_count >= fileSize || num_read < inLen)
 		{ break; }
 	}
 

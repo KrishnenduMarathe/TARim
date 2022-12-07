@@ -434,12 +434,17 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	unsigned long long int relativeLoc = 0;
 	for (long long int itr = 0; itr < option_num; itr++)
 	{
-		if (block_size == 0)
+		// DEBUG
+		printf("\tfsize: %lu\n", fArray[itr].fsize);
+		printf("\tSurvived: rLoc: %lu\n", relativeLoc);
+
+		if (block_size == 0 || fArray[itr].fsize == 0)
 		{
 			relativeLoc += fArray[itr].fsize;
 		} else {
 			// Adjust for padding
-			relativeLoc += fArray[itr].fsize - (fArray[itr].fsize % block_size) + block_size;
+			//relativeLoc += fArray[itr].fsize - (fArray[itr].fsize % block_size) + block_size;
+			relativeLoc += ((fArray[itr].fsize / block_size) + 1) * block_size;
 		}
 	}
 

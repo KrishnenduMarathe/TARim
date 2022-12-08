@@ -162,10 +162,7 @@ int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int file
 	fseek(infile, fileLoc, SEEK_SET);
 
 	unsigned char buffer;
-	unsigned long long int b_count = 0;
-	// DEBUG
-	printf("(DEBUG) nocrypt_extractfile: fileLoc: %lu | fsize: %lu\n\n", fileLoc, fileSize);
-	
+	unsigned long long int b_count = 0;	
 	while (fread(&buffer, sizeof(unsigned char), 1, infile) == 1)
 	{
 		fwrite(&buffer, sizeof(unsigned char), 1, outfile);

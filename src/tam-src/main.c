@@ -26,7 +26,60 @@
 
 #include "../libtarim.h"
 
+const void ascii_art()
+{
+	const char ascii_art[] = "\n \
+     #######################################################################\n \
+   ##                                                                       ##\n \
+ ##     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\        \\\\\\\\                 \\\\\\\\      \\\\\\\\        ##\n \
+ ##     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\       \\\\\\\\\\\\               \\\\\\\\\\\\    \\\\\\\\\\\\       ##\n \
+ ##             |||             \\\\\\    \\\\\\           |||    ||  ||    |||     ##\n \
+ ##             |||           |||        |||         |||    ||  ||    |||     ##\n \
+ ##             |||           |||        |||         |||    ||  ||    |||     ##\n \
+ ##              |             ||________||          |||    ||  ||    |||     ##\n \
+ ##              |             ||________||          |||     ____     |||     ##\n \
+ ##             |||           |||        |||         |||              |||     ##\n \
+ ##             |||           |||        |||         |||              |||     ##\n \
+ ##             |||           |||        |||         |||              |||     ##\n \
+ ##            |||||    <^>  |||||      |||||  <^>  |||||            |||||    ##\n \
+ ##                                                                           ##\n \
+ ##                                                  TARIM ARCHIVE MANAGER    ##\n \
+ ##                                                  ---------------------    ##\n \
+ ##                                                                           ##\n \
+ ##                                                                           ##\n \
+ ##      ============================================                         ##\n \
+ ##     | @Author:      Krishnendu Marathe           |                        ##\n \
+ ##     | @Repository:  github.com/KrishnenduMarathe |                        ##\n \
+ ##     | @Association: youtube.com/@kodespace       |                        ##\n \
+ ##      ============================================                         ##\n \
+ ##                                                                           ##\n \
+ ##                                                                           ##\n \
+ ##                                          +---------------------------+    ##\n \
+ ##                                          |          FEATURE          |    ##\n \
+ ##                                          +===========================+    ##\n \
+ ##                                          |           Just Like 'TAR' |    ##\n \
+ ##                                          |  New file format (.tarim) |    ##\n \
+ ##                                          | Selective File Extraction |    ##\n \
+ ##                                          |     Custom File Structure |    ##\n \
+ ##                                          | Uses Tarim shared Library |    ##\n \
+ ##                                          |       Supports Encryption |    ##\n \
+ ##                                          |          Requires OpenSSL |    ##\n \
+ ##                                          +---------------------------+    ##\n \
+   ##                                                                       ##\n \
+     #######################################################################\n \
+\n\n";
+
+	printf("%s\n", ascii_art);
+}
+
+
 int main(int argc, char** argv)
 {
+	if (argc < 3)
+	{
+		printf("\nInvalid Number of Arguments\n\t(Use 'tam.x86/tam.x64 -h' for more information.)\n");
+		return 1;
+	}
+	ascii_art();
 	return 0;
 }

@@ -377,7 +377,7 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 }
 
 // Extract File from Archie
-int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num)
+int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath)
 {
 	if (fArray == NULL)
 	{
@@ -392,6 +392,11 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	if (option_num < 0 || option_num >= meta.numFile+meta.numFolder)
 	{
 		printf("(ERROR) extract_file: File Index out of bounds\n");
+		return 1;
+	}
+	if (basePath == NULL)
+	{
+		printf("(ERROR) extract_file: basePath is a NULL Pointer\n");
 		return 1;
 	}
 	if (fArray[option_num].type == FS_FOLDER)
@@ -490,11 +495,15 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 
 	// STDOUT Message
 	printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);
-
-	FILE* outfile = fopen(fArray[option_num].fpath, "wb");
+	
+	// Extract Path
+	char extractPath[8192];
+	strcpy(extractPath, basePath);
+	strcat(extractPath, fArray[option_num].fpath);
+	FILE* outfile = fopen(extractPath, "wb");
 	if (outfile == NULL)
 	{
-		printf("(ERROR) extract_file: Failed to open file '%s'\n", fArray[option_num].fpath);
+		printf("(ERROR) extract_file: Failed to open file '%s'\n", extractPath);
 		return 1;
 	}
 	

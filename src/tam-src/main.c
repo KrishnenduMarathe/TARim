@@ -276,17 +276,61 @@ int main(int argc, char** argv)
 	unsigned char* key = NULL;
 	TARIM_METADATA meta;
 	TARIM_FILESAVE* fsave = NULL;
+	
+	// Out Operation
+	char basePath[4096];
+	if (out_flag)
+	{
+		strcpy(basePath, outArgument);
+		if (basePath[strlen(basePath) - 1] != '/' && extract_flag)
+		{
+			// Linux Specific
+			strcat(basePath, "/");
+		}
+	}
+	else
+	{
+		if (extract_flag)
+		{
+			strcpy(basePath, "./");
+		}
+		if (create_flag)
+		{
+			strcpy(basePath, "./tam.tarim");
+		}
+	}
 
-	// View Operation
+	// Extract & View Operation
 	if ( extract_flag || view_flag)
 	{
-		FILE* archive = fopen(viewArgument, "rb");
+		FILE* archive = NULL;
+		char buffer[FP_MAX];
+		if (extract_flag)
+		{
+			archive = fopen(extractArgument, "rb");
+			strcpy(buffer, extractArgument);
+		}
+		else if (view_flag)
+		{
+			archive = fopen(viewArgument, "rb");
+			strcpy(buffer, viewArgument);
+		}
+		else
+		{
+			strcpy(buffer, "<Unknown>");
+		}
 		if (archive == NULL)
 		{
-			printf("\nFailed to open Archive %s\n", viewArgument);
+			printf("\nFailed to open Archive %s\n", buffer);
 			return 1;
 		}
 		fsave = read_metadata_filedb(&meta, archive);
+		if (fsave == NULL)
+		{
+			fclose(archive);
+			free(fsave);
+			return 1;
+		}
 
 		display_tree(meta, fsave);
 
@@ -358,7 +402,7 @@ int main(int argc, char** argv)
 					{ continue; }
 
 					// Extract File
-					if (extract_file(meta, fsave, archive, key, itr))
+					if (extract_file(meta, fsave, archive, key, itr, basePath))
 					{
 						if (meta.encrypt != NO_ENCRYPT)
 						{ free(key); }
@@ -379,7 +423,7 @@ int main(int argc, char** argv)
 					{ continue; }
 
 					// Extract File
-					if (extract_file(meta, fsave, archive, key, file_no[i]))
+					if (extract_file(meta, fsave, archive, key, file_no[i], basePath))
 					{
 						if (meta.encrypt != NO_ENCRYPT)
 						{ free(key); }
@@ -390,7 +434,7 @@ int main(int argc, char** argv)
 
 					long long int percent_done = (i+1)/o_count*100;
 					update_progress_bar(percent_done);
-				} // MODIFY readwrite.c to accept base address
+				}
 			}
 			printf("\r");
 		}
@@ -400,6 +444,39 @@ int main(int argc, char** argv)
 		{ free(key); }
 		fclose(archive);
 		free(fsave);
-	}	
+	}
+
+	// Create Operation
+	if (create_flag)
+	{
+		// Create Archive
+		FILE* archive = fopen(basePath, "wb");
+		if (archive == NULL)
+		{
+			printf("\nFailed to create Archive %s\n", basePath);
+			return 1;
+		}
+		
+		// Get Key
+		if (encrypt_flag)
+		{
+			key = gen_256_key(NULL);
+		}
+		
+		if (update_write_metadata(&meta, encryptionMode, create_count, readArguments, archive))
+		{
+			if (encrypt_flag)
+			{ free(key); }
+			fclose(archive);
+			return 1;
+		}
+
+		// Clean up
+		if (encrypt_flag)
+		{ free(key); }
+		fclose(archive);
+		free(fsave);
+	}
+	
 	return 0;
 }

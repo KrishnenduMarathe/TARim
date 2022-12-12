@@ -163,6 +163,6 @@ TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive);
 // Write File Database and File Data in Archive
 int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key);
 // Extract File from Archie
-int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num);
+int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath);
 
 #endif // LIBTARIM_H_

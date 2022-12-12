@@ -470,6 +470,23 @@ int main(int argc, char** argv)
 			fclose(archive);
 			return 1;
 		}
+		fsave = save_filefolder_metadata(meta, create_count, readArguments);
+		if (fsave == NULL)
+		{
+			if (encrypt_flag)
+			{ free(key); }
+			fclose(archive);
+			return 1;
+		}
+
+		if (write_archive(meta, fsave, archive, key))
+		{
+			if (encrypt_flag)
+			{ free(key); }
+			fclose(archive);
+			free(fsave);
+			return 1;
+		}
 
 		// Clean up
 		if (encrypt_flag)

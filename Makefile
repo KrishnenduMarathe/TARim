@@ -27,8 +27,8 @@ lib: $(LIBOBJ) src/libtarim.h
 
 # Library Debug Compile Rules
 lib-dbg: src/libtarim.h
-	@echo "=> $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS)"
-	$(shell $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS))
+	@echo "=> $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim.so $(CCLIBS)"
+	$(shell $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim.so $(CCLIBS))
 	@echo "(debug) Library Compiled!"
 	@echo ""
 
@@ -42,8 +42,8 @@ exec: $(TAMOBJ) src/libtarim.h src/tam-src/tam.h lib
 
 # Executable Debug Compile Rules
 exec-dbg: src/libtarim.h src/tam-src/tam.h lib-dbg
-	@echo "=> $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim-dbg"
-	$(shell $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim-dbg)
+	@echo "=> $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim"
+	$(shell $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim)
 	@echo "TAM (debug) compiled!"
 	@echo "---------------------"
 	@echo ""

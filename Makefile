@@ -62,7 +62,7 @@ run:
 # Clean Rules
 clean:
 	$(shell rm src/lib-src/*.o)
-	$(shell rm libtarim.so libtarim-dbg.so)
+	$(shell rm libtarim.so)
 	$(shell rm src/tam-src/*.o)
 	$(shell rm $(EXEC))
 	@echo "Project Cleaned!"

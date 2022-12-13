@@ -172,7 +172,28 @@ int main(int argc, char** argv)
 	if (create_count == 0)
 	{ create_count = 1; }
 
-	char readArguments[create_count][FP_MAX];
+	char** readArguments = (char**) malloc(sizeof(char*)*create_count);
+	if (readArguments == NULL)
+	{
+		printf("\nFailed to allocate memory to create arguments\n");
+		return 1;
+
+	}
+	for (int i = 0; i < create_count; i++)
+	{
+		readArguments[i] = (char*) malloc(sizeof(char)*FP_MAX);
+		if (readArguments[i] == NULL)
+		{
+			printf("\nFailed to allocate memory to create arguments at stage %d\n", i);
+			for (int j = 0; j < i; j++)
+			{
+				free(readArguments[j]);
+			}
+			free(readArguments);
+			return 1;
+		}
+	}
+
 	char extractArgument[FP_MAX];
 	TARIM_CRYPT_MODES encryptionMode = NO_ENCRYPT;
 	char outArgument[FP_MAX];
@@ -207,6 +228,11 @@ int main(int argc, char** argv)
 			if (i+1 >= argc)
 			{
 				printf("\nExtract Operaton has no Argument\n");
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
 				return 1;
 			}
 			strcpy(extractArgument, argv[i+1]);
@@ -218,6 +244,11 @@ int main(int argc, char** argv)
 			if (i+1 >= argc)
 			{
 				printf("\nAlgorithm not specified\n");
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
 				return 1;
 			}
 			
@@ -236,6 +267,11 @@ int main(int argc, char** argv)
 			else
 			{
 				printf("\nUnknown Algorithm %s passed\n", argv[i+1]);
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
 				return 1;
 			}
 		}
@@ -245,6 +281,11 @@ int main(int argc, char** argv)
 			if (i+1 >= argc)
 			{
 				printf("\nOut Operaton has no Argument\n");
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
 				return 1;
 			}
 			strcpy(outArgument, argv[i+1]);
@@ -255,22 +296,16 @@ int main(int argc, char** argv)
 			if (i+1 >= argc)
 			{
 				printf("\nView Operaton has no Argument\n");
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
 				return 1;
 			}
 			strcpy(viewArgument, argv[i+1]);
 		}
 	}
-
-	// DEBUG
-	printf("Create Options: \n");
-	for (int j = 0; j < create_count; j++)
-	{
-		printf("\t%s\n", readArguments[j]);
-	}
-	printf("\nExtract Options: %s\n", extractArgument);
-	printf("\nEncrypt Options: %d\n", encryptionMode);
-	printf("\nOut Options: %s\n", outArgument);
-	printf("\nView Options: %s\n\n", viewArgument);
 
 	// Required Variables
 	unsigned char* key = NULL;
@@ -322,6 +357,11 @@ int main(int argc, char** argv)
 		if (archive == NULL)
 		{
 			printf("\nFailed to open Archive %s\n", buffer);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 		fsave = read_metadata_filedb(&meta, archive);
@@ -329,6 +369,11 @@ int main(int argc, char** argv)
 		{
 			fclose(archive);
 			free(fsave);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 
@@ -407,6 +452,11 @@ int main(int argc, char** argv)
 						{ free(key); }
 						fclose(archive);
 						free(fsave);
+						for (int i = 0; i < create_count; i++)
+						{
+							free(readArguments[i]);
+						}
+						free(readArguments);
 						return 1;
 					}
 
@@ -428,6 +478,11 @@ int main(int argc, char** argv)
 						{ free(key); }
 						fclose(archive);
 						free(fsave);
+						for (int i = 0; i < create_count; i++)
+						{
+							free(readArguments[i]);
+						}
+						free(readArguments);
 						return 1;
 					}
 
@@ -442,7 +497,7 @@ int main(int argc, char** argv)
 		if (meta.encrypt != NO_ENCRYPT)
 		{ free(key); }
 		fclose(archive);
-		free(fsave);
+		free(fsave);	
 	}
 
 	// Create Operation
@@ -453,6 +508,11 @@ int main(int argc, char** argv)
 		if (archive == NULL)
 		{
 			printf("\nFailed to create Archive %s\n", basePath);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 		
@@ -467,6 +527,11 @@ int main(int argc, char** argv)
 			if (encrypt_flag)
 			{ free(key); }
 			fclose(archive);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 		fsave = save_filefolder_metadata(meta, create_count, readArguments);
@@ -475,6 +540,11 @@ int main(int argc, char** argv)
 			if (encrypt_flag)
 			{ free(key); }
 			fclose(archive);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 
@@ -484,6 +554,11 @@ int main(int argc, char** argv)
 			{ free(key); }
 			fclose(archive);
 			free(fsave);
+			for (int i = 0; i < create_count; i++)
+			{
+				free(readArguments[i]);
+			}
+			free(readArguments);
 			return 1;
 		}
 
@@ -493,6 +568,13 @@ int main(int argc, char** argv)
 		fclose(archive);
 		free(fsave);
 	}
+	
+	// Free allocated space
+	for (int i = 0; i < create_count; i++)
+	{
+		free(readArguments[i]);
+	}
+	free(readArguments);
 	
 	return 0;
 }

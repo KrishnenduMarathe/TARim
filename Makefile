@@ -12,8 +12,9 @@ endif
 
 # File Sets
 LIBOBJ=src/lib-src/decrypt.o src/lib-src/encrypt.o src/lib-src/func.o src/lib-src/readwrite.o
-TAMSRC=src/tam-src/main.o src/tam-src/tam.o
+TAMOBJ=src/tam-src/main.o src/tam-src/tam.o
 
+all: release
 release: lib exec
 debug: clean lib-dbg exec-dbg
 
@@ -32,15 +33,15 @@ lib-dbg: src/libtarim.h
 	@echo ""
 
 # Executable Release Compile Rules
-exec: $(TAMSRC) src/libtarim.h src/tam-src/tam.h lib
-	@echo "=> $(CC) $(TAMSRC) -o $(EXEC) -L. -ltarim"
-	$(shell $(CC) $(TAMSRC) -o $(EXEC) -L. -ltarim)
+exec: $(TAMOBJ) src/libtarim.h src/tam-src/tam.h lib
+	@echo "=> $(CC) $(TAMOBJ) -o $(EXEC) -L. -ltarim"
+	$(shell $(CC) $(TAMOBJ) -o $(EXEC) -L. -ltarim)
 	@echo "TAM (release) Compiled!"
 	@echo "-----------------------"
 	@echo ""
 
 # Executable Debug Compile Rules
-exec-dbg: src/libtarim.h lib-dbg
+exec-dbg: src/libtarim.h src/tam-src/tam.h lib-dbg
 	@echo "=> $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim-dbg"
 	$(shell $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -ltarim-dbg)
 	@echo "TAM (debug) compiled!"

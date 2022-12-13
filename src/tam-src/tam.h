@@ -34,5 +34,4 @@ void ascii_art();
 void help_text();
 void display_tree(const TARIM_METADATA meta, const TARIM_FILESAVE* fsave);
 
-
 #endif // TAM_H_

@@ -393,7 +393,6 @@ int main(int argc, char** argv)
 				key = gen_256_key(NULL);
 			}
 
-			int bar_length = 25;
 			if (all_flag)
 			{	
 				for (long long int itr = 0; itr < meta.numFile+meta.numFolder; itr++)

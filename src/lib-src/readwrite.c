@@ -325,7 +325,6 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 
 	// Write Files to the Archive
 	FILE* infile;
-	int bar_length = 25;
 	for (long long int itr = 0; itr < meta.numFile+meta.numFolder; itr++)
 	{
 		if (fArray[itr].type != FS_FILE)

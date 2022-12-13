@@ -180,7 +180,7 @@ void update_progress_bar(long long int percent_done)
 	const int bar_length = 40;
 
 	int num_char = percent_done * bar_length / 100;
-	printf("\t||");
+	printf("\r||");
 	for (int e = 0; e < bar_length; e++)
 	{
 		if (e < num_char)

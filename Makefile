@@ -1,6 +1,5 @@
 # C Compiler
 CC=gcc
-CCFLAGS=-fPIC -shared
 CCLIBS=-lc -lcrypto
 
 # Executable Name
@@ -11,31 +10,31 @@ else
 	EXEC=tam.x86
 endif
 
-# Object Sets
+# File Sets
 LIBOBJ=src/lib-src/decrypt.o src/lib-src/encrypt.o src/lib-src/func.o src/lib-src/readwrite.o
-TAMOBJ=src/tam-src/main.o
+TAMSRC=src/tam-src/main.o src/tam-src/tam.o
 
 release: lib exec
 debug: clean lib-dbg exec-dbg
 
 # Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h
-	@echo "=> $(CC) $(CCFLAGS) $(LIBOBJ) -o libtarim.so $(CCLIBS)"
-	$(shell $(CC) $(CCFLAGS) $(LIBOBJ) -o libtarim.so $(CCLIBS))
+	@echo "=> $(CC) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS)"
+	$(shell $(CC) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS))
 	@echo "(release) Library Compiled!"
 	@echo ""
 
 # Library Debug Compile Rules
 lib-dbg: src/libtarim.h
-	@echo "=> $(CC) -g $(CCFLAGS) src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS)"
-	$(shell $(CC) -g $(CCFLAGS) src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS))
+	@echo "=> $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS)"
+	$(shell $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim-dbg.so $(CCLIBS))
 	@echo "(debug) Library Compiled!"
 	@echo ""
 
 # Executable Release Compile Rules
-exec: $(TAMOBJ) src/libtarim.h lib
-	@echo "=> $(CC) $(TAMOBJ) -o $(EXEC) -L. -ltarim"
-	$(shell $(CC) $(TAMOBJ) -o $(EXEC) -L. -ltarim)
+exec: $(TAMSRC) src/libtarim.h src/tam-src/tam.h lib
+	@echo "=> $(CC) $(TAMSRC) -o $(EXEC) -L. -ltarim"
+	$(shell $(CC) $(TAMSRC) -o $(EXEC) -L. -ltarim)
 	@echo "TAM (release) Compiled!"
 	@echo "-----------------------"
 	@echo ""
@@ -48,7 +47,7 @@ exec-dbg: src/libtarim.h lib-dbg
 	@echo "---------------------"
 	@echo ""
 
-# Object Rules
+# Library Object Rules
 %.o: %.c
 	@echo "-> $(CC) -c $^ -o $@"
 	$(shell $(CC) -c $^ -o $@)

@@ -141,6 +141,8 @@ unsigned char* gen_256_key(void (*get_pass)(char*));
 int nocrypt_write(FILE* infile, FILE* outfile);
 // Write Raw data from archive
 int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize);
+// Draw and Update progress bar
+void update_progress_bar(long long int percent_done);
 
 // ###############
 // # readwrite.c #

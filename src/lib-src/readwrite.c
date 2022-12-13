@@ -325,10 +325,10 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 
 	// Write Files to the Archive
 	FILE* infile;
-	int bar_length = 25; // Continue progress bar
-	for (long long int itr = 0; itr < (meta.numFile + meta.numFolder); itr++)
+	int bar_length = 25;
+	for (long long int itr = 0; itr < meta.numFile+meta.numFolder; itr++)
 	{
-		if (fArray[itr].type == FS_FOLDER)
+		if (fArray[itr].type != FS_FILE)
 		{ continue; }
 
 		// STDOUT Message
@@ -372,6 +372,9 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		}
 
 		fclose(infile);
+
+		long long int percent_done = (itr+1)/(meta.numFile+meta.numFolder)*100;
+		update_progress_bar(percent_done);
 	}
 
 	return 0;

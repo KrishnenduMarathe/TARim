@@ -173,3 +173,27 @@ int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int file
 
 	return 0;
 }
+
+// Draw and Update Progress Bar
+void update_progress_bar(long long int percent_done)
+{
+	const int bar_length = 40;
+
+	int num_char = percent_done * bar_length / 100;
+	printf("\t||");
+	for (int e = 0; e < bar_length; e++)
+	{
+		if (e < num_char)
+		{
+			printf("#");
+		}
+		else
+		{
+			printf(">");
+		}
+	}
+
+	printf("||\t%d%%", percent_done);
+	fflush(stdout);
+}
+

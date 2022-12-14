@@ -245,7 +245,8 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 	meta->iv_size = 16;
 
 	unsigned char* iv = gen_128_iv();
-	if (iv == NULL) { return 1; }
+	if (iv == NULL)
+	{ return 1; }
 	strncpy(meta->iv, iv, meta->iv_size);
 
 	for (unsigned int itr = 0; itr < arg_num; itr++)
@@ -287,6 +288,19 @@ TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 	{
 		printf("(ERROR) read_metadata_filedb: File not Archived by libtarim or is corrupted\n");
 		return NULL;
+	}
+	if (meta->version > VERSION)
+	{
+		printf("(ERROR) read_metadata_filedb: File was created by tarim library of higher version\n");
+		return NULL;
+	}
+	else
+	{
+		if (meta->version == VERSION && meta->revision > REVISION)
+		{
+			printf("(ERROR) read_metadata_filedb: File was created by tarim library of higher revision\n");
+			return NULL;
+		}
 	}
 	
 	fileFolderObjectsSize = meta->numFile + meta->numFolder;

@@ -367,6 +367,10 @@ int main(int argc, char** argv)
 			free(readArguments);
 			return 1;
 		}
+		// Print Metadata
+		printf("Library Used: %s\n", meta.whoami);
+		printf("Version: %u rev %u\n\n", meta.version, meta.revision);
+		
 		fsave = read_metadata_filedb(&meta, archive);
 		if (fsave == NULL)
 		{

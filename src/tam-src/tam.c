@@ -107,3 +107,21 @@ void display_tree(const TARIM_METADATA meta, const TARIM_FILESAVE* fsave)
 	}
 }
 
+void get_password(char* passwd)
+{
+	char* password = NULL;
+	// Linux
+	password = getpass("Enter Password: ");
+	if (password == NULL)
+	{
+		printf("\nError: Could not retrieve password\n");
+		exit(1);
+	}
+
+	strcpy(passwd, password);
+	free(password);
+
+	// New Line
+	printf("\n");
+}
+

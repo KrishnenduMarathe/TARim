@@ -24,7 +24,7 @@ lib: $(LIBOBJ) src/libtarim.h
 	$(shell $(CC) -fPIC -shared $(LIBOBJ) -o libtarim.so $(CCLIBS))
 	@echo ""
 	@echo "+-----------------------------+"
-	@echo "| (release) Library Compiled! |"
+	@echo "| Library (release) Compiled! |"
 	@echo "+-----------------------------+"
 	@echo ""
 
@@ -34,7 +34,7 @@ lib-dbg: src/libtarim.h
 	$(shell $(CC) -g -fPIC -shared src/lib-src/*.c -o libtarim.so $(CCLIBS))
 	@echo ""
 	@echo "+---------------------------+"
-	@echo "| (debug) Library Compiled! |"
+	@echo "| Library (debug) Compiled! |"
 	@echo "+---------------------------+"
 	@echo ""
 

@@ -49,8 +49,6 @@
 #define VERSION 1
 #define REVISION 0
 
-#define CLEARSCREEN "clear" // Linux
-
 // File Save Types
 #ifndef TARIM_FILESAVE_TYPES
 #define TARIM_FILESAVE_TYPES
@@ -131,8 +129,6 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 // # func.c #
 // ##########
 
-// Get Password
-static void get_password(char* passwd);
 // Generate 128 bit Initialization Vector
 unsigned char* gen_128_iv();
 // Generate 256 bit key
@@ -142,7 +138,7 @@ int nocrypt_write(FILE* infile, FILE* outfile);
 // Write Raw data from archive
 int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize);
 // Draw and Update progress bar
-void update_progress_bar(long long int percent_done);
+void update_progress_bar(int percent_done, const char* filename, int arraysize);
 
 // ###############
 // # readwrite.c #

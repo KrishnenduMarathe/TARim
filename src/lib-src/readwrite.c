@@ -330,9 +330,6 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		if (fArray[itr].type != FS_FILE)
 		{ continue; }
 
-		// STDOUT Message
-		printf("-> (write_archive) Writing '%s'\n", fArray[itr].fpath);
-		
 		infile = fopen(fArray[itr].fpath, "rb");
 		if (infile == NULL)
 		{
@@ -372,8 +369,8 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 
 		fclose(infile);
 
-		long long int percent_done = (itr+1)/(meta.numFile+meta.numFolder)*100;
-		update_progress_bar(percent_done);
+		int percent_done = (int) ((itr+1)*100/(meta.numFile+meta.numFolder));
+		update_progress_bar(percent_done, fArray[itr].fpath, sizeof(fArray[itr].fpath));
 	}
 
 	return 0;
@@ -497,7 +494,7 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	}
 
 	// STDOUT Message
-	printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);
+	//printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);
 	
 	// Extract Path
 	char extractPath[8192];

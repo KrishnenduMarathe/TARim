@@ -307,6 +307,9 @@ int main(int argc, char** argv)
 		}
 	}
 
+	// Display ASCII Art
+	ascii_art();
+
 	// Required Variables
 	unsigned char* key = NULL;
 	TARIM_METADATA meta;
@@ -383,11 +386,11 @@ int main(int argc, char** argv)
 		{
 			int all_flag = 0;
 
-			printf("\n[-1]  All Files\nChoose Files to Extract. Multiple files can be specifies in comma separated fashion.\n.Files to Extract: ");
+			printf("\n[-1]  All Files\nChoose Files to Extract. Multiple files can be specifies in comma separated fashion.\n\n=> Files to Extract: ");
 			char files[8096];
 			scanf("%s", files);
 
-			int o_count = 0;
+			int o_count = 1;
 			for (int i = 0; i < strlen(files); i++)
 			{
 				if (files[i] == ',')
@@ -420,6 +423,14 @@ int main(int argc, char** argv)
 					strncat(buffer, &files[i], 1);
 				}
 
+				if (i >= strlen(files) - 1)
+				{
+					// check if buffer contains number
+					file_no[iteration] = atoi(buffer);
+					iteration++;
+					clear = 1;
+				}
+
 			}
 
 			// Check for all marker
@@ -435,7 +446,19 @@ int main(int argc, char** argv)
 			// Check for Encryption and get Key
 			if (meta.encrypt != NO_ENCRYPT)
 			{
-				key = gen_256_key(NULL);
+				key = gen_256_key(&get_password);
+				if (key == NULL)
+				{
+					printf("\nFailed to get password from function\n");
+					fclose(archive);
+					free(fsave);
+					for (int i = 0; i < create_count; i++)
+					{
+						free(readArguments[i]);
+					}
+					free(readArguments);
+					return 1;
+				}
 			}
 
 			if (all_flag)
@@ -460,8 +483,8 @@ int main(int argc, char** argv)
 						return 1;
 					}
 
-					long long int percent_done = (itr+1)/(meta.numFile+meta.numFolder)*100;
-					update_progress_bar(percent_done);
+					int percent_done =  (int) ((itr+1)*100/(meta.numFile+meta.numFolder));
+					update_progress_bar(percent_done, fsave[itr].fpath, sizeof(fsave[itr].fpath));
 				}	
 			}
 			else
@@ -486,8 +509,8 @@ int main(int argc, char** argv)
 						return 1;
 					}
 
-					long long int percent_done = (i+1)/o_count*100;
-					update_progress_bar(percent_done);
+					int percent_done = (int) ((i+1)*100/o_count);
+					update_progress_bar(percent_done, fsave[file_no[i]].fpath, sizeof(fsave[file_no[i]].fpath));
 				}
 			}
 			printf("\r");
@@ -519,7 +542,20 @@ int main(int argc, char** argv)
 		// Get Key
 		if (encrypt_flag)
 		{
-			key = gen_256_key(NULL);
+			key = gen_256_key(&get_password);
+
+			if (key == NULL)
+			{
+				printf("\nFailed to get password from function\n");
+				fclose(archive);
+				free(fsave);
+				for (int i = 0; i < create_count; i++)
+				{
+					free(readArguments[i]);
+				}
+				free(readArguments);
+				return 1;
+			}
 		}
 		
 		if (update_write_metadata(&meta, encryptionMode, create_count, readArguments, archive))

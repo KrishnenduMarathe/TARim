@@ -27,11 +27,13 @@
 #ifndef TAM_H_
 #define TAM_H_
 
+#include <unistd.h> // Linux
 #include "../libtarim.h"
 
 // Function Prototypes
 void ascii_art();
 void help_text();
 void display_tree(const TARIM_METADATA meta, const TARIM_FILESAVE* fsave);
+void get_password(char* passwd);
 
 #endif // TAM_H_

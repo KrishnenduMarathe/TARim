@@ -26,14 +26,6 @@
 
 #include "../libtarim.h"
 
-// Get Password
-static void get_password(char* passwd)
-{
-	printf("Enter Password: ");
-	scanf("%s", passwd);
-	system(CLEARSCREEN);
-}
-
 // Generate 128 bit Initialization Vector
 unsigned char* gen_128_iv()
 {
@@ -60,7 +52,11 @@ unsigned char* gen_256_key(void (*get_pass)(char*))
 	int passLen = 0;
 	char password[1024];
 	if (get_pass == NULL)
-	{ get_pass = &get_password; }
+	{
+		printf("(ERROR) gen_256_key: Password Function not passed\n");
+		return NULL;
+	}
+	
 	(*get_pass)(password);
 
 	for (int itr = 0; itr < 1024; itr++)
@@ -175,24 +171,41 @@ int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int file
 }
 
 // Draw and Update Progress Bar
-void update_progress_bar(long long int percent_done)
+void update_progress_bar(int percent_done, const char* filename, int arraysize)
 {
+	if (filename == NULL)
+	{
+		printf("(ERROR) update_progress_bar: NULL File Name passsed\n");
+		return;
+	}
 	int bar_length = 40;
-
+	int name_length = bar_length / 2;
 	int num_char = percent_done * bar_length / 100;
-	printf("\r||");
+	
+	// Print File Name
+	for (int j = 0; j < arraysize; j++)
+	{
+		printf("%c", filename[j]);
+		if (j >= name_length - 2)
+		{
+			printf("..");
+			break;
+		}
+	}
+	
+	printf("  [");
 	for (int e = 0; e < bar_length; e++)
 	{
 		if (e < num_char)
 		{
-			printf("#");
+			printf(">");
 		}
 		else
 		{
-			printf(">");
+			printf("-");
 		}
 	}
 
-	printf("||\t%d%%", percent_done);
+	printf("]\t%d%%\n", percent_done);
 }
 

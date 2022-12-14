@@ -281,7 +281,14 @@ TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 
 	// Read Metadata
 	fread(meta, sizeof(TARIM_METADATA), 1, archive);
-
+	
+	// Verify Metadata
+	if (strcmp(meta->whoami, "TARim: KodeSpace") != 0)
+	{
+		printf("(ERROR) read_metadata_filedb: File not Archived by libtarim or is corrupted\n");
+		return NULL;
+	}
+	
 	fileFolderObjectsSize = meta->numFile + meta->numFolder;
 	fileFolderObjects = (TARIM_FILESAVE* ) calloc(fileFolderObjectsSize, sizeof(TARIM_FILESAVE));
 	if (fileFolderObjects == NULL)

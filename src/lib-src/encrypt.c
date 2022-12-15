@@ -27,7 +27,7 @@
 #include "../libtarim.h"
 
 // Encrypt File using AES-256
-int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
+int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -118,7 +118,7 @@ int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 }
 
 // Encrypt File using ARIA-256
-int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
+int TARIM_encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -209,7 +209,7 @@ int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 }
 
 // Encrypt File using Camellia-256
-int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
+int TARIM_encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -298,3 +298,4 @@ int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 	
 	return 0;
 }
+

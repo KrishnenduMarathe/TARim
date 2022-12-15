@@ -366,12 +366,9 @@ int main(int argc, char** argv)
 			}
 			free(readArguments);
 			return 1;
-		}
-		// Print Metadata
-		printf("Library Used: %s\n", meta.whoami);
-		printf("Version: %u rev %u\n\n", meta.version, meta.revision);
+		}	
 		
-		fsave = read_metadata_filedb(&meta, archive);
+		fsave = TARIM_read_metadata_filedb(&meta, archive);
 		if (fsave == NULL)
 		{
 			fclose(archive);
@@ -383,6 +380,10 @@ int main(int argc, char** argv)
 			free(readArguments);
 			return 1;
 		}
+
+		// Print Metadata
+		printf("Library Used: %s\n", meta.whoami);
+		printf("Version: %u rev %u\n\n", meta.version, meta.revision);
 
 		display_tree(meta, fsave);
 
@@ -450,7 +451,7 @@ int main(int argc, char** argv)
 			// Check for Encryption and get Key
 			if (meta.encrypt != NO_ENCRYPT)
 			{
-				key = gen_256_key(&get_password);
+				key = TARIM_gen_256_key(&get_password);
 				if (key == NULL)
 				{
 					printf("\nFailed to get password from function\n");
@@ -473,7 +474,7 @@ int main(int argc, char** argv)
 					{ continue; }
 
 					// Extract File
-					if (extract_file(meta, fsave, archive, key, itr, basePath))
+					if (TARIM_extract_file(meta, fsave, archive, key, itr, basePath))
 					{
 						if (meta.encrypt != NO_ENCRYPT)
 						{ free(key); }
@@ -488,7 +489,7 @@ int main(int argc, char** argv)
 					}
 
 					int percent_done =  (int) ((itr+1)*100/(meta.numFile+meta.numFolder));
-					update_progress_bar(percent_done, fsave[itr].fpath, sizeof(fsave[itr].fpath));
+					TARIM_update_progress_bar(percent_done, fsave[itr].fpath, sizeof(fsave[itr].fpath));
 				}	
 			}
 			else
@@ -499,7 +500,7 @@ int main(int argc, char** argv)
 					{ continue; }
 
 					// Extract File
-					if (extract_file(meta, fsave, archive, key, file_no[i], basePath))
+					if (TARIM_extract_file(meta, fsave, archive, key, file_no[i], basePath))
 					{
 						if (meta.encrypt != NO_ENCRYPT)
 						{ free(key); }
@@ -514,7 +515,7 @@ int main(int argc, char** argv)
 					}
 
 					int percent_done = (int) ((i+1)*100/o_count);
-					update_progress_bar(percent_done, fsave[file_no[i]].fpath, sizeof(fsave[file_no[i]].fpath));
+					TARIM_update_progress_bar(percent_done, fsave[file_no[i]].fpath, sizeof(fsave[file_no[i]].fpath));
 				}
 			}
 			printf("\r");
@@ -546,7 +547,7 @@ int main(int argc, char** argv)
 		// Get Key
 		if (encrypt_flag)
 		{
-			key = gen_256_key(&get_password);
+			key = TARIM_gen_256_key(&get_password);
 
 			if (key == NULL)
 			{
@@ -562,7 +563,7 @@ int main(int argc, char** argv)
 			}
 		}
 		
-		if (update_write_metadata(&meta, encryptionMode, create_count, readArguments, archive))
+		if (TARIM_update_write_metadata(&meta, encryptionMode, create_count, readArguments, archive))
 		{
 			if (encrypt_flag)
 			{ free(key); }
@@ -574,7 +575,7 @@ int main(int argc, char** argv)
 			free(readArguments);
 			return 1;
 		}
-		fsave = save_filefolder_metadata(meta, create_count, readArguments);
+		fsave = TARIM_save_filefolder_metadata(meta, create_count, readArguments);
 		if (fsave == NULL)
 		{
 			if (encrypt_flag)
@@ -588,7 +589,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		if (write_archive(meta, fsave, archive, key))
+		if (TARIM_write_archive(meta, fsave, archive, key))
 		{
 			if (encrypt_flag)
 			{ free(key); }
@@ -618,3 +619,4 @@ int main(int argc, char** argv)
 	
 	return 0;
 }
+

@@ -108,59 +108,59 @@ typedef struct
 // #############
 
 // Decrypt File using AES-256
-int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
+int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 // Decrypt File using ARIA-256
-int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
+int TARIM_decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 // Decrypt File using Camellia-256
-int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
+int TARIM_decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize);
 
 // #############
 // # encrypt.c #
 // #############
 
 // Encrypt File using AES-256
-int encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
+int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 // Encrypt File using ARIA-256
-int encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
+int TARIM_encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 // Encrypt File using Camellia-256
-int encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
+int TARIM_encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv);
 
 // ##########
 // # func.c #
 // ##########
 
 // Generate 128 bit Initialization Vector
-unsigned char* gen_128_iv();
+unsigned char* TARIM_gen_128_iv();
 // Generate 256 bit key
-unsigned char* gen_256_key(void (*get_pass)(char*));
+unsigned char* TARIM_gen_256_key(void (*get_pass)(char*));
 // Write Raw data from one to other
-int nocrypt_write(FILE* infile, FILE* outfile);
+int TARIM_nocrypt_write(FILE* infile, FILE* outfile);
 // Write Raw data from archive
-int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize);
+int TARIM_nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize);
 // Draw and Update progress bar
-void update_progress_bar(int percent_done, const char* filename, int arraysize);
+void TARIM_update_progress_bar(int percent_done, const char* filename, int arraysize);
 
 // ###############
 // # readwrite.c #
 // ###############
 
 // Identify Directory
-static int isDir(const char* filePath);
+static int TARIM_isDir(const char* filePath);
 // Identify Regular File
-static int isReg(const char* filePath);
+static int TARIM_isReg(const char* filePath);
 // Count Directories and Files
-static void count_filefolder(char* basePath, TARIM_METADATA* meta);
+static void TARIM_count_filefolder(char* basePath, TARIM_METADATA* meta);
 // Populate Tarim Filesave structure to an array
-static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILESAVE* fArray);
+static void TARIM_recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILESAVE* fArray);
 // Gather Files and Folders Objects
-TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args);
+TARIM_FILESAVE* TARIM_save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args);
 // Populate Metadata
-int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_num, char** args, FILE* archive);
+int TARIM_update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_num, char** args, FILE* archive);
 // Read Metadata and File Database
-TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive);
+TARIM_FILESAVE* TARIM_read_metadata_filedb(TARIM_METADATA* meta, FILE* archive);
 // Write File Database and File Data in Archive
-int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key);
+int TARIM_write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key);
 // Extract File from Archie
-int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath);
+int TARIM_extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath);
 
 #endif // LIBTARIM_H_

@@ -27,7 +27,7 @@
 #include "../libtarim.h"
 
 // Generate 128 bit Initialization Vector
-unsigned char* gen_128_iv()
+unsigned char* TARIM_gen_128_iv()
 {
 	unsigned char* iv = (unsigned char*) malloc(sizeof(unsigned char) * 16);
 	if (iv == NULL)
@@ -46,7 +46,7 @@ unsigned char* gen_128_iv()
 }
 
 // Generate 256 bit key
-unsigned char* gen_256_key(void (*get_pass)(char*))
+unsigned char* TARIM_gen_256_key(void (*get_pass)(char*))
 {
 	// Get Password
 	int passLen = 0;
@@ -130,7 +130,7 @@ unsigned char* gen_256_key(void (*get_pass)(char*))
 }
 
 // Write Raw data from one to other
-int nocrypt_write(FILE* infile, FILE* outfile)
+int TARIM_nocrypt_write(FILE* infile, FILE* outfile)
 {
 	if (infile == NULL || outfile == NULL )
 	{
@@ -146,7 +146,7 @@ int nocrypt_write(FILE* infile, FILE* outfile)
 }
 
 // Write Raw data from archive
-int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize)
+int TARIM_nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int fileLoc, unsigned long int fileSize)
 {
 	if (infile == NULL || outfile == NULL)
 	{
@@ -171,7 +171,7 @@ int nocrypt_extractfile(FILE* infile, FILE* outfile, unsigned long long int file
 }
 
 // Draw and Update Progress Bar
-void update_progress_bar(int percent_done, const char* filename, int arraysize)
+void TARIM_update_progress_bar(int percent_done, const char* filename, int arraysize)
 {
 	if (filename == NULL)
 	{

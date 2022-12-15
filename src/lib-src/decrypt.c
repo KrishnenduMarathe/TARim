@@ -27,7 +27,7 @@
 #include "../libtarim.h"
 
 // Decrypt File using AES-256
-int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
+int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -123,7 +123,7 @@ int decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsigned cha
 }
 
 // Decrypt File using ARIA-256
-int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
+int TARIM_decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -219,7 +219,7 @@ int decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsigned ch
 }
 
 // Decrypt File using Camellia-256
-int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
+int TARIM_decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigned char* iv, unsigned long long int fileLoc, unsigned long int fileSize)
 {
 	if (infile == NULL || outfile == NULL || key == NULL || iv == NULL)
 	{
@@ -313,3 +313,4 @@ int decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, unsigne
 	
 	return 0;
 }
+

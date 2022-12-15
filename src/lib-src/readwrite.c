@@ -27,7 +27,7 @@
 #include "../libtarim.h"
 
 // Identify Directory
-static int isDir(const char* filePath)
+static int TARIM_isDir(const char* filePath)
 {
 	struct stat path;
 	stat(filePath, &path);
@@ -35,7 +35,7 @@ static int isDir(const char* filePath)
 }
 
 // Identify Regular File
-static int isReg(const char* filePath)
+static int TARIM_isReg(const char* filePath)
 {
 	struct stat path;
 	stat(filePath, &path);
@@ -43,7 +43,7 @@ static int isReg(const char* filePath)
 }
 
 // Count Directories and Files
-static void count_filefolder(char* basePath, TARIM_METADATA* meta)
+static void TARIM_count_filefolder(char* basePath, TARIM_METADATA* meta)
 {
 	char *path;
 	struct dirent *dp;
@@ -66,13 +66,13 @@ static void count_filefolder(char* basePath, TARIM_METADATA* meta)
 			strcat(path, "/");
 			strcat(path, dp->d_name);
 
-			if (isDir(path))
+			if (TARIM_isDir(path))
 			{ meta->numFolder += 1; }
 			
-			if (isReg(path))
+			if (TARIM_isReg(path))
 			{ meta->numFile += 1; }
 			
-			count_filefolder(path, meta);
+			TARIM_count_filefolder(path, meta);
 			free(path);
 		}
 	}
@@ -81,7 +81,7 @@ static void count_filefolder(char* basePath, TARIM_METADATA* meta)
 }
 
 // Populate Tarim Filesave structure to an array
-static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILESAVE* fArray)
+static void TARIM_recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILESAVE* fArray)
 {
 	char *path;
 	struct dirent *dp;
@@ -106,7 +106,7 @@ static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILE
 
 			path[(sizeof(basePath)+sizeof("/")+sizeof(dp->d_name)) / sizeof(char)] = '\0';
 
-			if (isDir(path))
+			if (TARIM_isDir(path))
 			{
 				uint8_t flag = 1;
 				for (long long int itr = 0; itr < *fc; itr++)
@@ -129,7 +129,7 @@ static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILE
 				}
 			}
 
-			if (isReg(path))
+			if (TARIM_isReg(path))
 			{
 				fArray[*fc].type = FS_FILE;
 				
@@ -148,7 +148,7 @@ static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILE
 				*fc += 1;
 			}
 
-			recursiveFilesaveArray(path, fc, fArray);
+			TARIM_recursiveFilesaveArray(path, fc, fArray);
 			free(path);
 		}
 	}
@@ -157,7 +157,7 @@ static void recursiveFilesaveArray(char* basePath, long long int* fc, TARIM_FILE
 }
 
 // Gather Files and Folders Objects
-TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args)
+TARIM_FILESAVE* TARIM_save_filefolder_metadata(const TARIM_METADATA meta, int arg_num, char** args)
 {
 	TARIM_FILESAVE* fileFolderObjects = NULL;
 	long long int fcount = 0;
@@ -174,7 +174,7 @@ TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num,
 	for (unsigned int itr = 0; itr < arg_num; itr++)
 	{
 
-		if (isDir(args[itr]))
+		if (TARIM_isDir(args[itr]))
 		{
 			uint8_t flag = 1;
 			for (long long int itr2 = 0; itr2 < fcount; itr2++)
@@ -196,7 +196,7 @@ TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num,
 				fcount += 1;
 			}
 		}
-		if (isReg(args[itr]))
+		if (TARIM_isReg(args[itr]))
 		{
 			fileFolderObjects[fcount].type = FS_FILE;
 				
@@ -215,14 +215,14 @@ TARIM_FILESAVE* save_filefolder_metadata(const TARIM_METADATA meta, int arg_num,
 			fcount += 1;
 		}
 		
-		recursiveFilesaveArray(args[itr], &fcount, fileFolderObjects);
+		TARIM_recursiveFilesaveArray(args[itr], &fcount, fileFolderObjects);
 	}
 
 	return fileFolderObjects;
 }
 
 // Populate Metadata
-int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_num, char** args, FILE* archive)
+int TARIM_update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_num, char** args, FILE* archive)
 {
 	if (meta == NULL)
 	{
@@ -244,7 +244,7 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 	meta->numFolder = 0;
 	meta->iv_size = 16;
 
-	unsigned char* iv = gen_128_iv();
+	unsigned char* iv = TARIM_gen_128_iv();
 	if (iv == NULL)
 	{ return 1; }
 	strncpy(meta->iv, iv, meta->iv_size);
@@ -252,10 +252,10 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 	for (unsigned int itr = 0; itr < arg_num; itr++)
 	{
 
-		if (isDir(args[itr])) { meta->numFolder += 1; }
-		if (isReg(args[itr])) { meta->numFile += 1; }
+		if (TARIM_isDir(args[itr])) { meta->numFolder += 1; }
+		if (TARIM_isReg(args[itr])) { meta->numFile += 1; }
 		
-		count_filefolder(args[itr], meta);
+		TARIM_count_filefolder(args[itr], meta);
 	}
 
 	// Write Metadata
@@ -264,7 +264,7 @@ int update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, int arg_
 }
 
 // Read Metadata and File Database
-TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
+TARIM_FILESAVE* TARIM_read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 {
 	if (meta == NULL)
 	{
@@ -321,7 +321,7 @@ TARIM_FILESAVE* read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 }
 
 // Write File Database and File Data in Archive
-int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key)
+int TARIM_write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key)
 {
 	if (fArray == NULL)
 	{
@@ -369,19 +369,19 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		switch (meta.encrypt)
 		{
 		case NO_ENCRYPT:
-			if (nocrypt_write(infile, archive)) { return 1; }
+			if (TARIM_nocrypt_write(infile, archive)) { return 1; }
 			break;
 		
 		case AES_256_CBC:
-			if (encrypt_aes256(infile, archive, key, iv)) { return 1; }
+			if (TARIM_encrypt_aes256(infile, archive, key, iv)) { return 1; }
 			break;
 		
 		case ARIA_256_CBC:
-			if (encrypt_aria256(infile, archive, key, iv)) { return 1; }
+			if (TARIM_encrypt_aria256(infile, archive, key, iv)) { return 1; }
 			break;
 
 		case CAMELLIA_256_CBC:
-			if (encrypt_camellia256(infile, archive, key, iv)) { return 1; }
+			if (TARIM_encrypt_camellia256(infile, archive, key, iv)) { return 1; }
 			break;
 		
 		default:
@@ -391,14 +391,14 @@ int write_archive(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE*
 		fclose(infile);
 
 		int percent_done = (int) ((itr+1)*100/(meta.numFile+meta.numFolder));
-		update_progress_bar(percent_done, fArray[itr].fpath, sizeof(fArray[itr].fpath));
+		TARIM_update_progress_bar(percent_done, fArray[itr].fpath, sizeof(fArray[itr].fpath));
 	}
 
 	return 0;
 }
 
 // Extract File from Archie
-int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath)
+int TARIM_extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* archive, unsigned char* key, long long int option_num, char* basePath)
 {
 	if (fArray == NULL)
 	{
@@ -514,9 +514,6 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 		closedir(doesitexist);
 	}
 
-	// STDOUT Message
-	//printf("-> (extract_file) Extracting '%s'\n", fArray[option_num].fpath);
-	
 	// Extract Path
 	char extractPath[8192];
 	strcpy(extractPath, basePath);
@@ -539,19 +536,19 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	switch (meta.encrypt)
 	{
 	case NO_ENCRYPT:
-		if (nocrypt_extractfile(archive, outfile, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		if (TARIM_nocrypt_extractfile(archive, outfile, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
 		break;
 		
 	case AES_256_CBC:
-		if (decrypt_aes256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		if (TARIM_decrypt_aes256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
 		break;
 		
 	case ARIA_256_CBC:
-		if (decrypt_aria256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		if (TARIM_decrypt_aria256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
 		break;
 
 	case CAMELLIA_256_CBC:
-		if (decrypt_camellia256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
+		if (TARIM_decrypt_camellia256(archive, outfile, key, iv, startLoc+relativeLoc, fArray[option_num].fsize)) { return 1; }
 		break;
 	
 	default:
@@ -561,3 +558,4 @@ int extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, FILE* 
 	fclose(outfile);
 	return 0;
 }
+

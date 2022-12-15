@@ -77,7 +77,7 @@ run:
 
 # Install Rules
 .PHONY:
-install: release
+install:
 	@echo ""
 	$(shell sudo mv $(EXEC) /usr/local/bin)
 	$(shell sudo mv $(LIB) /usr/local/lib)

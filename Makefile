@@ -79,8 +79,8 @@ run:
 .PHONY:
 install:
 	@echo ""
-	$(shell sudo mv $(EXEC) /usr/local/bin)
-	$(shell sudo mv $(LIB) /usr/local/lib)
+	$(shell sudo cp $(EXEC) /usr/local/bin)
+	$(shell sudo cp $(LIB) /usr/local/lib)
 	@echo "Exporting Library Path for this terminal session..."
 	$(shell export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib)
 	@echo ""

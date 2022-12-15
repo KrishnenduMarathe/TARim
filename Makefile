@@ -20,7 +20,7 @@ TAMOBJ=src/tam-src/main.o src/tam-src/tam.o
 
 all: release
 release: lib exec
-debug: clean lib-dbg exec-dbg
+debug: lib-dbg exec-dbg
 
 # Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h
@@ -76,7 +76,7 @@ run:
 	$(shell LD_LIBRARY_PATH="$(shell pwd):$LD_LIBRARY_PATH" ./$(EXEC))
 
 # Install Rules
-.PHONY: install
+.PHONY:
 install: release
 	@echo ""
 	$(shell sudo mv $(EXEC) /usr/local/bin)

@@ -85,7 +85,7 @@ install:
 	$(shell export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib)
 	@echo ""
 	@echo "Remember to add following lines to .bashrc/.zshrc file to avoid providing library location everytime:"
-	@echo "\texport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib"
+	@echo "    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib"
 	@echo ""
 	@echo "+===========================+"
 	@echo "| TAM & LIBTARIM Installed! |"
@@ -99,7 +99,7 @@ uninstall:
 	$(shell sudo rm /usr/local/bin/$(EXEC))
 	$(shell sudo rm /usr/local/lib/$(LIB))
 	@echo "Remember to remove following lines from .bashrc/.zshrc file:"
-	@echo "\texport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib"
+	@echo "    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib"
 	@echo ""
 	@echo "+=============================+"
 	@echo "| TAM & LIBTARIM Uninstalled! |"

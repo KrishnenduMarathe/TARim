@@ -496,7 +496,7 @@ int main(int argc, char** argv)
 			{
 				for (int i = 0; i < o_count; i++)
 				{
-					if (file_no[i] <= 0)
+					if (file_no[i] < 0)
 					{ continue; }
 
 					// Extract File

@@ -102,7 +102,7 @@ void display_tree(const TARIM_METADATA meta, const TARIM_FILESAVE* fsave)
 	{
 		if (fsave[itr].type != FS_FOLDER)
 		{
-			printf("[%llu]  %s (%lu)\n", itr+1, fsave[itr].fpath, fsave[itr].fsize);
+			printf("[%llu]  %s (%lu)\n", itr, fsave[itr].fpath, fsave[itr].fsize);
 		}
 	}
 }

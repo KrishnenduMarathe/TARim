@@ -22,6 +22,11 @@ all: release
 release: lib exec
 debug: lib-dbg exec-dbg
 
+# Object Rules
+%.o: %.c
+	@echo "-> $(CC) -c -fPIC $^ -o $@"
+	$(shell $(CC) -c -fPIC $^ -o $@)
+
 # Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h
 	@echo "=> $(CC) -fPIC -shared $(LIBOBJ) -o $(LIB) $(CCLIBS)"
@@ -43,7 +48,11 @@ lib-dbg: src/libtarim.h
 	@echo ""
 
 # Executable Release Compile Rules
-exec: $(TAMOBJ) src/libtarim.h src/tam-src/tam.h lib
+exec: src/tam-src/main.c src/tam-src/tam.c src/libtarim.h src/tam-src/tam.h lib
+	@echo "-> $(CC) -c src/tam-src/main.c -o src/tam-src/main.o"
+	$(shell $(CC) -c src/tam-src/main.c -o src/tam-src/main.o)
+	@echo "-> $(CC) -c src/tam-src/tam.c -o src/tam-src/tam.o"
+	$(shell $(CC) -c src/tam-src/tam.c -o src/tam-src/tam.o)
 	@echo "=> $(CC) $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
 	$(shell $(CC) $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
 	@echo ""
@@ -53,19 +62,18 @@ exec: $(TAMOBJ) src/libtarim.h src/tam-src/tam.h lib
 	@echo ""
 
 # Executable Debug Compile Rules
-exec-dbg: src/libtarim.h src/tam-src/tam.h lib-dbg
-	@echo "=> $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -$(LINK)"
-	$(shell $(CC) -g src/tam-src/*.c -o $(EXEC) -L. -$(LINK))
+exec-dbg: src/tam-src/main.c src/tam-src/tam.c src/libtarim.h src/tam-src/tam.h lib-dbg
+	@echo "-> $(CC) -c -g src/tam-src/main.c -o src/tam-src/main.o"
+	$(shell $(CC) -c -g src/tam-src/main.c -o src/tam-src/main.o)
+	@echo "-> $(CC) -c -g src/tam-src/tam.c -o src/tam-src/tam.o"
+	$(shell $(CC) -c -g src/tam-src/tam.c -o src/tam-src/tam.o)
+	@echo "=> $(CC) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
+	$(shell $(CC) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
 	@echo ""
 	@echo "+=======================+"
 	@echo "| TAM (debug) compiled! |"
 	@echo "+=======================+"
 	@echo ""
-
-# Library Object Rules
-%.o: %.c
-	@echo "-> $(CC) -c $^ -o $@"
-	$(shell $(CC) -c $^ -o $@)
 
 # Run Executable if Library not installed
 .PHONY: run

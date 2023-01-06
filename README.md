@@ -60,6 +60,6 @@
     3. No Extraction concurrent jobs added in TAM (Tarim Archive Manager) [You can implement 
        yourself as of now. The library has no issue with it]
     4. Maximum number of files is 9,223,372,036,854,775,807 (32 bit/64 bit)
-    5. Files with a size of 2464 B or a multiple of it, the decryption fails with bad decrypt error.
+    5. Files with a size of encryption block size [2464 B] or a multiple of it, the decryption fails with bad decrypt error.
 
 

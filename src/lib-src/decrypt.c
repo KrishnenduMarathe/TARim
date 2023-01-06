@@ -55,7 +55,7 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	const int inLen = block_size;
+	int inLen = block_size;
 	int outLen = block_size + block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	

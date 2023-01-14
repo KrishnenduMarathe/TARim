@@ -55,8 +55,8 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	int inLen = 1024;
-	int outLen = 1024 + block_size;
+	int inLen = block_size;
+	int outLen = inLen + block_size + 1;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -154,8 +154,8 @@ int TARIM_decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsig
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	int inLen = 1024;
-	int outLen = 1024 + block_size;
+	int inLen = block_size;
+	int outLen = inLen + block_size + 1;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -253,8 +253,8 @@ int TARIM_decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, u
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
-	int inLen = 1024;
-	int outLen = 1024 + block_size;
+	int inLen = block_size;
+	int outLen = inLen + block_size + 1;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))

@@ -40,7 +40,6 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <linux/limits.h>
 
 #include <openssl/evp.h>
 #include <openssl/err.h>

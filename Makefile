@@ -2,16 +2,38 @@
 CC=gcc
 CCLIBS=-lc -lcrypto
 
+# Detect Operating System Between Mac and Linux
+os=$(shell uname)
+
 # Executable Name
 LBITs=$(shell getconf LONG_BIT)
+
 ifeq ($(LBITs), 64)
+
+ifeq ($(os), Darwin) # Mac OS X
+	EXEC=tam.x64
+	LIB=libtarim.x64.dylib
+	LINK=ltarim.x64
+endif
+ifeq ($(os), Linux) # Linux
 	EXEC=tam.x64
 	LIB=libtarim.x64.so
 	LINK=ltarim.x64
+endif
+
 else
+
+ifeq ($(os), Darwin) # Mac OS X
+	EXEC=tam.x86
+	LIB=libtarim.x86.dylib
+	LINK=ltarim.x86
+endif
+ifeq ($(os), Linux) # Linux
 	EXEC=tam.x86
 	LIB=libtarim.x86.so
 	LINK=ltarim.x86
+endif
+
 endif
 
 # File Sets
@@ -79,9 +101,10 @@ exec-dbg: src/tam-src/main.c src/tam-src/tam.c src/libtarim.h src/tam-src/tam.h 
 .PHONY: run
 run:
 	@echo ""
-	@echo "Running Executable..."
+	@echo "Running Executable using command locally:"
+	@echo "LD_LIBRARY_PATH='$(shell pwd):$LD_LIBRARY_PATH' ./$(EXEC)"
 	@echo ""
-	$(shell LD_LIBRARY_PATH="$(shell pwd):$LD_LIBRARY_PATH" ./$(EXEC))
+	@echo "Run [make install] to install to the system"
 
 # Install Rules
 .PHONY:

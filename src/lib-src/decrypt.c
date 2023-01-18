@@ -50,13 +50,13 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		return 1;
 	}
 
-	// Explicitly Enable Padding
-	EVP_CIPHER_CTX_set_padding(ctx, 1);
+	// Disable Padding
+	EVP_CIPHER_CTX_set_padding(ctx, 0);
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
 	int inLen = block_size;
-	int outLen = inLen + block_size + 1;
+	int outLen = inLen + block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -92,6 +92,18 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 		b_count += num_read;
 
+		// EOF to padding
+		if (num_read < inLen)
+		{ break; }
+
+		int temp = 0;
+		if (b_count >= fileSize)
+		{
+			temp = num_read;
+			num_read -= (b_count - fileSize);
+			break;
+		}
+
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
 			printf("(ERROR) decrypt_aes256: Failed to pass bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
@@ -101,21 +113,36 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 			return 1;
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
-
-		// EOF
-		if (b_count >= fileSize || num_read < inLen)
-		{ break; }
 	}
 
+	// Manual Padding
+	if (num_read < inLen)
+	{
+		for (int cc = num_read; cc < inLen; cc++)
+		{
+			inbuffer[cc] = '\0';
+		}
+	}
+	
+	if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
+		{
+			printf("(ERROR) decrypt_aes256: Failed to pass padding bytes to the cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
+			
+			EVP_CIPHER_free(cipher);
+			EVP_CIPHER_CTX_free(ctx);
+			return 1;
+		}
+	}
+	
 	// Cipher Final block with padding
-	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
+	/*if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
 	{
 		printf("(ERROR) decrypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
 		EVP_CIPHER_free(cipher);
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
-	}
+	}*/
 	fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 	// Clean up

@@ -83,9 +83,20 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	}
 
 	// Loop until bytes read
-	while (1)
+	int l_exit = 0;
+	while (!l_exit)
 	{
 		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
+
+		// Manual Paddng
+		if (num_read < inLen)
+		{
+			l_exit = 1;
+			for (int cc = num_read; cc < inLen; cc++)
+			{
+				inbuffer[cc] = '\0';
+			}
+		}
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -96,14 +107,10 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 			return 1;
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
-
-		// EOF
-		if (num_read < inLen)
-		{ break; }
 	}
 
 	// Cipher Final block with padding
-	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
+	/*if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
 	{
 		printf("(ERROR) encrypt_aes256: Failed to pass bytes from final block to cipher. OpenSSL: %s\n", ERR_error_string(ERR_get_error(), NULL));
 
@@ -111,7 +118,7 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
 	}
-	fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
+	fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);*/
 
 	// Clean up
 	EVP_CIPHER_free(cipher);

@@ -1,5 +1,6 @@
 # C Compiler
 CC=gcc
+CCFLAGS=
 CCLIBS=-lc -lcrypto
 
 # Detect Operating System Between Mac and Linux
@@ -51,8 +52,8 @@ debug: lib-dbg exec-dbg
 
 # Library Release Compile Rules
 lib: $(LIBOBJ) src/libtarim.h
-	@echo "=> $(CC) -fPIC -shared $(LIBOBJ) -o $(LIB) $(CCLIBS)"
-	$(shell $(CC) -fPIC -shared $(LIBOBJ) -o $(LIB) $(CCLIBS))
+	@echo "=> $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o $(LIB) $(CCLIBS)"
+	$(shell $(CC) $(CCFLAGS) -fPIC -shared $(LIBOBJ) -o $(LIB) $(CCLIBS))
 	@echo ""
 	@echo "+-----------------------------+"
 	@echo "| Library (release) Compiled! |"
@@ -61,8 +62,8 @@ lib: $(LIBOBJ) src/libtarim.h
 
 # Library Debug Compile Rules
 lib-dbg: src/libtarim.h
-	@echo "=> $(CC) -g -fPIC -shared src/lib-src/*.c -o $(LIB) $(CCLIBS)"
-	$(shell $(CC) -g -fPIC -shared src/lib-src/*.c -o $(LIB) $(CCLIBS))
+	@echo "=> $(CC) $(CCFLAGS) -g -fPIC -shared src/lib-src/*.c -o $(LIB) $(CCLIBS)"
+	$(shell $(CC) $(CCFLAGS) -g -fPIC -shared src/lib-src/*.c -o $(LIB) $(CCLIBS))
 	@echo ""
 	@echo "+---------------------------+"
 	@echo "| Library (debug) Compiled! |"
@@ -75,8 +76,8 @@ exec: src/tam-src/main.c src/tam-src/tam.c src/libtarim.h src/tam-src/tam.h lib
 	$(shell $(CC) -c src/tam-src/main.c -o src/tam-src/main.o)
 	@echo "-> $(CC) -c src/tam-src/tam.c -o src/tam-src/tam.o"
 	$(shell $(CC) -c src/tam-src/tam.c -o src/tam-src/tam.o)
-	@echo "=> $(CC) $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
-	$(shell $(CC) $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
+	@echo "=> $(CC) $(CCFLAGS) $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
+	$(shell $(CC) $(CCFLAGS) $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
 	@echo ""
 	@echo "+=========================+"
 	@echo "| TAM (release) Compiled! |"
@@ -89,8 +90,8 @@ exec-dbg: src/tam-src/main.c src/tam-src/tam.c src/libtarim.h src/tam-src/tam.h 
 	$(shell $(CC) -c -g src/tam-src/main.c -o src/tam-src/main.o)
 	@echo "-> $(CC) -c -g src/tam-src/tam.c -o src/tam-src/tam.o"
 	$(shell $(CC) -c -g src/tam-src/tam.c -o src/tam-src/tam.o)
-	@echo "=> $(CC) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
-	$(shell $(CC) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
+	@echo "=> $(CC) $(CCFLAGS) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK)"
+	$(shell $(CC) $(CCFLAGS) -g $(TAMOBJ) -o $(EXEC) -L. -$(LINK))
 	@echo ""
 	@echo "+=======================+"
 	@echo "| TAM (debug) compiled! |"

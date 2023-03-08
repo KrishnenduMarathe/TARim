@@ -56,7 +56,7 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
 	int inLen = block_size;
-	int outLen = inLen + block_size;
+	int outLen = block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 1, NULL))
@@ -89,7 +89,7 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
 
 		// Manual Paddng
-		if (num_read < inLen)
+		if (num_read < inLen && num_read > 0)
 		{
 			l_exit = 1;
 			for (int cc = num_read; cc < inLen; cc++)

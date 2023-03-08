@@ -497,7 +497,7 @@ int TARIM_extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, 
 			relativeLoc += fArray[itr].fsize;
 			if (fArray[itr].fsize % block_size != 0)
 			{
-				relativeLoc += block_size - ((fArray[itr].fsize / block_size));
+				relativeLoc += block_size - (fArray[itr].fsize % block_size);
 			}
 		}
 	}

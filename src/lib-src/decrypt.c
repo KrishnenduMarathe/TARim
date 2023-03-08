@@ -56,7 +56,7 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
 	int inLen = block_size;
-	int outLen = inLen + block_size;
+	int outLen = block_size;
 	unsigned char inbuffer[inLen], outbuffer[outLen]; // Allow space for additional block in outbuffer
 	
 	if (!EVP_CipherInit_ex2(ctx, cipher, NULL, NULL, 0, NULL))
@@ -90,22 +90,16 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	unsigned long long int b_count = 0;
 	while (!l_exit)
 	{
-		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
-		b_count += num_read;
-		
-		// Manual Paddng at EOF
-		if (b_count >= fileSize)
+		if (b_count > 0)
 		{
-			num_read -= (b_count - fileSize);
-		}
-		if (num_read < inLen)
-		{
-			l_exit = 1;
-			for (int cc = num_read; cc < inLen; cc++)
+			if (b_count + inLen >= fileSize)
 			{
-				inbuffer[cc] = '\0';
+				l_exit = 1;
 			}
 		}
+
+		num_read = fread(inbuffer, sizeof(unsigned char), inLen, infile);
+		b_count += num_read;
 
 		if (!EVP_CipherUpdate(ctx, outbuffer, &outLen, inbuffer, num_read))
 		{
@@ -114,6 +108,15 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 			EVP_CIPHER_free(cipher);
 			EVP_CIPHER_CTX_free(ctx);
 			return 1;
+		}
+
+		// Remove Manual Padding
+		if (l_exit)
+		{
+			for (int cc = (num_read - b_count + fileSize); cc < outLen; cc++)
+			{
+				outbuffer[cc] = '\0';
+			}
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 	}

@@ -491,14 +491,14 @@ int TARIM_extract_file(const TARIM_METADATA meta, const TARIM_FILESAVE* fArray, 
 			relativeLoc += fArray[itr].fsize;
 		} else {
 			// Adjust for padding
-			//relativeLoc += ((fArray[itr].fsize / block_size) + 1) * block_size;
+			relativeLoc += ((fArray[itr].fsize / block_size) + 1) * block_size;
 			
 			// Adjust for custom padding
-			relativeLoc += fArray[itr].fsize;
-			if (fArray[itr].fsize % block_size != 0)
-			{
-				relativeLoc += block_size - (fArray[itr].fsize % block_size);
-			}
+			//relativeLoc += fArray[itr].fsize;
+			//if (fArray[itr].fsize % block_size != 0)
+			//{
+			//	relativeLoc += block_size - (fArray[itr].fsize % block_size);
+			//}
 		}
 	}
 

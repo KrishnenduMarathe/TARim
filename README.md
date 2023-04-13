@@ -5,7 +5,7 @@
     Includes Shared Library (libtarim) to create or extract .tarim archive and default archive     
     manager called TAM / Tarim Archive Manager.
     
-![alt_tag](https://github.com/KrishnenduMarathe/TARim/blob/main/media/asciiArt.png)
+	![alt_tag](https://github.com/KrishnenduMarathe/TARim/blob/main/media/asciiArt.png)
     
 ## *Features*
 	

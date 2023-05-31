@@ -236,7 +236,7 @@ int TARIM_update_write_metadata(TARIM_METADATA* meta, TARIM_CRYPT_MODES mode, in
 	}
 
 	// Initiate Metadata values
-	strcpy(meta->whoami, "TARim: KodeSpace");
+	strcpy(meta->whoami, "TARim: FundaCode");
 	meta->version = VERSION;
 	meta->revision = REVISION;
 	meta->encrypt = mode;

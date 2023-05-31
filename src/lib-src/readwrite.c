@@ -284,7 +284,7 @@ TARIM_FILESAVE* TARIM_read_metadata_filedb(TARIM_METADATA* meta, FILE* archive)
 	fread(meta, sizeof(TARIM_METADATA), 1, archive);
 	
 	// Verify Metadata
-	if (strcmp(meta->whoami, "TARim: KodeSpace") != 0)
+	if (strcmp(meta->whoami, "TARim: FundaCode") != 0)
 	{
 		printf("(ERROR) read_metadata_filedb: File not Archived by libtarim or is corrupted\n");
 		return NULL;

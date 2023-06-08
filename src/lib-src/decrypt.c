@@ -86,6 +86,7 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
+	unsigned long int apparent_size = ((fileSize / block_size) + 1) * block_size;
 	unsigned long long int b_count = 0;
 	while (1)
 	{
@@ -102,30 +103,10 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		}
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
-		// DEBUG
-		printf("%16llu: First 8 bytes of Out Buffer: ", b_count);
-		for (int i = 0; i < 8; i++)
-		{
-			printf("%c ", outbuffer[i]);
-		}
-		printf("\n");
-
 		// EOF
-		if (b_count >= fileSize || num_read < inLen)
+		if (b_count >= apparent_size || num_read < inLen)
 		{ break; }
 	}
-
-	// DEBUG
-	printf("\nDebug Information:\n\tFile Size: %lu\n", fileSize);
-	printf("\tByte Count: %llu\n\tLast Read Bytes: %d\n", b_count, num_read);
-	printf("\tBuffer Size: %d\n\tOut Buffer Suze: %d\n\n", inLen, outLen);
-	printf("Out Buffer State:");
-	for (int i = 0; i < inLen*3; i++)
-	{
-		if (i % 8 == 0) { printf("\n\t"); }
-		printf("%c ", outbuffer[i]);
-	}
-	printf("\n-- END --\n\n");
 
 	// Cipher Final block with padding
 	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))
@@ -205,6 +186,7 @@ int TARIM_decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsig
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
+	unsigned long int apparent_size = ((fileSize / block_size) + 1) * block_size;
 	unsigned long long int b_count = 0;
 	while (1)
 	{
@@ -222,7 +204,7 @@ int TARIM_decrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsig
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (b_count >= fileSize || num_read < inLen)
+		if (b_count >= apparent_size || num_read < inLen)
 		{ break; }
 	}
 
@@ -304,6 +286,7 @@ int TARIM_decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, u
 	fseek(infile, fileLoc, SEEK_SET);
 
 	// Loop until bytes read
+	unsigned long int apparent_size = ((fileSize / block_size) + 1) * block_size;
 	unsigned long long int b_count = 0;
 	while (1)
 	{
@@ -321,7 +304,7 @@ int TARIM_decrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, u
 		fwrite(outbuffer, sizeof(unsigned char), outLen, outfile);
 
 		// EOF
-		if (b_count >= fileSize || num_read < inLen)
+		if (b_count >= apparent_size || num_read < inLen)
 		{ break; }
 	}
 

@@ -111,6 +111,13 @@ int TARIM_decrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 	printf("\nDebug Information:\n\tFile Size: %lu\n", fileSize);
 	printf("\tByte Count: %llu\n\tLast Read Bytes: %d\n", b_count, num_read);
 	printf("\tBuffer Size: %d\n\tOut Buffer Suze: %d\n\n", inLen, outLen);
+	printf("Out Buffer State:");
+	for (int i = 0; i < inLen*3; i++)
+	{
+		if (i % 8 == 0) { printf("\n\t"); }
+		printf("%2c  ", outbuffer[i]);
+	}
+	printf("-- END --\n\n");
 
 	// Cipher Final block with padding
 	if (!EVP_CipherFinal_ex(ctx, outbuffer, &outLen))

@@ -17,7 +17,7 @@
 ## *Requirements*
 	
     1. C Compiler
-	2. OpenSSL
+	2. OpenSSL (Version 3+)
 
 ## *License*
 	
@@ -34,8 +34,21 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+## *Installing using release binaries*
+
+	Currently, I am providing binaries for 64 bit linux machine. People using other systems,
+	compile the binaries using instructions in the next section.
+
+	*-> Linux*
+		1. Extract the binaries from the archive provided with the release
+		2. Move "tam.x64" to /usr/local/bin
+		3. Move "libtarim.so" to /usr/local/lib
+
 
 ## *Build Instructions*
+
+	Make sure you have installed OpenSSl version 3 or above on your system.
+
 1. **Clone the Repository**
 
 		git clone https://github.com/KrishnenduMarathe/TARim.git

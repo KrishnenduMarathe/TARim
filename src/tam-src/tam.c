@@ -107,10 +107,10 @@ void display_tree(const TARIM_METADATA meta, const TARIM_FILESAVE* fsave)
 	}
 }
 
-void get_password(char* passwd)
+void get_password(char* passwd) // Linux Specific
 {
 	char* password = NULL;
-	// Linux
+	
 	password = getpass("Enter Password: ");
 	if (password == NULL)
 	{
@@ -121,7 +121,6 @@ void get_password(char* passwd)
 	strcpy(passwd, password);
 	free(password);
 
-	// New Line
 	printf("\n");
 }
 

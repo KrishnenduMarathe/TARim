@@ -27,8 +27,9 @@
 #ifndef TAM_H_
 #define TAM_H_
 
-#include <unistd.h> // Linux
 #include "../libtarim.h"
+
+#include <unistd.h> // Linux
 
 // Function Prototypes
 void ascii_art();

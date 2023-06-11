@@ -50,9 +50,6 @@ int TARIM_encrypt_aes256(FILE* infile, FILE* outfile, unsigned char* key, unsign
 		return 1;
 	}
 
-	// Disable Padding
-	//EVP_CIPHER_CTX_set_padding(ctx, 0);
-
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
 	int inLen = block_size;
@@ -144,9 +141,6 @@ int TARIM_encrypt_aria256(FILE* infile, FILE* outfile, unsigned char* key, unsig
 		return 1;
 	}
 
-	// Disable Padding
-	//EVP_CIPHER_CTX_set_padding(ctx, 0);
-
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);
 	int inLen = block_size;
@@ -237,9 +231,6 @@ int TARIM_encrypt_camellia256(FILE* infile, FILE* outfile, unsigned char* key, u
 		EVP_CIPHER_CTX_free(ctx);
 		return 1;
 	}
-
-	// Disable Padding
-	//EVP_CIPHER_CTX_set_padding(ctx, 0);
 
 	int num_read = 0;
 	int block_size = EVP_CIPHER_block_size(cipher);

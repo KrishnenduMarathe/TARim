@@ -42,7 +42,7 @@
 	*-> Linux*
 		1. Extract the binaries from the archive provided with the release
 		2. Move "tam.x64" to /usr/local/bin
-		3. Move "libtarim.so" to /usr/local/lib
+		3. Move "libtarim.x64.so" to /usr/local/lib
 
 
 ## *Build Instructions*

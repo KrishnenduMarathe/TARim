@@ -50,7 +50,7 @@ void ascii_art()
  ##      ============================================                         ##\n \
  ##     | @Author:      Krishnendu Marathe           |                        ##\n \
  ##     | @Repository:  github.com/KrishnenduMarathe |                        ##\n \
- ##     | @Association: youtube.com/@kodespace       |                        ##\n \
+ ##     | @Association: youtube.com/@FundaCode       |                        ##\n \
  ##      ============================================                         ##\n \
  ##                                                                           ##\n \
  ##                                                                           ##\n \
